@@ -1,0 +1,40 @@
+<html th:replace="admin_base::layout(~{::section})">
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-10 mt-3">
+			<div class="bg-light rounded h-80 p-4">
+				<h6 class="mb-4">Horizontal Form</h6>
+				<form th:action="@{'/ADMIN/updateUser/' +${updateUser.id}}" method="post" th:object="${updateUser}">
+					<div class="row mb-3">
+						<label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="inputEmail3" name="name" th:value="*{name}">
+						</div>
+					</div>
+					<div class="row mb-3">
+						<label for="inputEmail3" class="col-sm-2 col-form-label">Address</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="inputEmail3" name="address" th:value="*{address}">
+						</div>
+					</div>
+					<div class="row mb-3">
+						<label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+						<div class="col-sm-10">
+							<input type="email" class="form-control" id="inputEmail3" name="email" th:value="*{email}">
+						</div>
+					</div>
+					<div class="row mb-3">
+						<label for="inputPassword3" class="col-sm-2 col-form-label">Phone</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="inputPassword3" name="phone" th:value="*{phone}">
+						</div>
+					</div>
+					<button type="submit" class="btn btn-primary">Update</button>
+				</form>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

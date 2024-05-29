@@ -1,0 +1,48 @@
+<html th:replace="admin_base::layout(~{::section})">
+
+<head>
+
+</head>
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-12 mt-4">
+					<div class="bg-light rounded h-80 p-4">
+					
+						<h6 class="mb-4">Categories</h6>
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th scope="col"> Id</th>
+									<th scope="col">Name</th>
+									<th>Price</th>
+									<th>Image</th>
+									<th>Status</th>
+									<th>Update</th>
+									<th>Delete</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="e:${plist}">
+									<th scope="row" th:text="${e.pid}"></th>
+									<td th:text="${e.pname}"></td>
+									<td th:text="${e.price}"></td>
+									<td> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;"> </td>
+									<td th:text="${e.status}"></td>
+									</td>
+									<td> <a class="btn btn-primary" th:href="@{'/ADMIN/update_product_form/' +${e.pid}}">Update</a>
+									</td>
+									<td> <a class="btn btn-danger" th:href="@{'/ADMIN/delete_product/' +${e.pid}}">Delete</a>
+									</td>
+		
+		
+								</tr>
+		
+							</tbody>
+						</table>
+					</div>
+				</div>
+	</section>
+</body>
+
+</html>

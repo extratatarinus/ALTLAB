@@ -1,0 +1,69 @@
+<html th:replace="admin_base::layout(~{::section})">
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-12 mt-4">
+			<div class="bg-light rounded h-80 p-4">
+				<form class="d-none d-md-flex  col-xl-3">
+					<input class="form-control border-0" type="search" placeholder="Search" id="searchInput">
+				</form>
+				
+				<h6 class="mb-4">Users</h6>
+				<a th:href="@{/ADMIN/add_admin_form?role=USER}">
+				<button type="button" class="btn btn-primary " ><i class="fa fa-plus m-1"></i>Add User</button>
+				</a>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col">ID</th>
+							<th scope="col">Name</th>
+							<th scope="col">Address</th>
+							<th scope="col">Email</th>
+							<th scope="col">Phone</th>
+							<th scope="col">Status</th>
+							<th scope="col">Update</th>
+							<th scope="col">Delete</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="e:${users}" >
+							<td scope="col"> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;">
+							</td>
+							<td scope="row" th:text="${e.id}"></td>
+							<td th:text="${e.name}"></td>
+							<td th:text="${e.address}"> </td>
+							<td th:text="${e.email}"></td>
+							<td th:text="${e.phone}"></td>
+							<td th:text="${e.status}"></td>
+							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/userUpdateForm/'+${e.id}}">Update</a>
+							</td>
+							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/userDelete/'+${e.id}}">Delete</a> </td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<script>
+		    $(document).ready(function() {
+		        // Handle keyup event on search input
+		        $('#searchInput').keyup(function() {
+		            var searchText = $(this).val().toLowerCase();
+		
+		            // Filter user table based on search input
+		            $('tbody tr').each(function() {
+		                var userText = $(this).text().toLowerCase();
+		                if (userText.indexOf(searchText) === -1) {
+		                    $(this).hide();
+		                } else {
+		                    $(this).show();
+		                }
+		            });
+		        });
+		    });
+		</script>
+	</section>
+</body>
+
+</html>

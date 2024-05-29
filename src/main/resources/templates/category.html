@@ -1,0 +1,61 @@
+<html th:replace="admin_base::layout(~{::section})">
+
+<head>
+
+</head>
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-12 mt-4">
+			<div class="bg-light rounded h-80 p-4">
+
+				<div class="col-sm-12 col-xl-6">
+					<div class="bg-light rounded h-20 p-1">
+						<h6 class="mb-2">Add Category</h6>
+						<form th:action="@{/ADMIN/add_category}" method="post" enctype="multipart/form-data">
+							<div class="mb-3">
+
+								<input type="text" class="form-control" id="exampleInputEmail1"
+									aria-describedby="emailHelp" name="cname">
+							</div>
+							<div class="mb-3">
+								<label for="exampleInputPassword1" class="form-label">Image</label>
+								<input type="file" class="form-control" id="exampleInputPassword1" name="image">
+							</div>
+							<button type="submit" class="btn btn-primary">Add</button>
+						</form>
+					</div>
+				</div>
+				<h6 class="mb-4">Categories</h6>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col">Category id</th>
+							<th scope="col">Category Name</th>
+							<th scope="col">Sub Categories</th>
+							<th scope="col">Update</th>
+							<th scope="col">Delete</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="e:${categories}">
+							<td scope="col"> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;">
+							</td>
+							<td scope="row" th:text="${e.cid}"></td>
+							<td th:text="${e.cname}"></td>
+							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/sub_category/' +${e.cid}}">View</a> </td>
+							<td> <a class="btn btn-primary"
+									th:href="@{'/ADMIN/updateFormCategory/'+${e.cid}}">Update</a> </td>
+							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/deleteCategory/'+${e.cid}}">Delete</a>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

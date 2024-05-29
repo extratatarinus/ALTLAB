@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecom-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecom-app
+  template:
+    metadata:
+      labels:
+        app: ecom-app
+    spec:
+      containers:
+      - name: ecom-app
+        image: roshanteli/myrepo:21.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_APPLICATION_NAME
+          value: "ECOM"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "root"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "4#gr1Tio"
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://security-service:3306/ecom"
+        - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+          value: "com.mysql.cj.jdbc.Driver"
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: "update"
+        - name: SPRING_WEB_RESOURCES_STATIC_LOCATIONS
+          value: "classpath:/static/"
+        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+          value: "org.hibernate.dialect.MySQLDialect"
+        - name: SPRING_MAIL_PASSWORD
+          value: "uclc njqm skbi mlbm"
+        - name: SPRING_MAIL_HOST
+          value: "smtp.gmail.com"
+        - name: SPRING_MAIL_PORT
+          value: "587"
+        - name: SPRING_MAIL_USERNAME
+          value: "Roshanshah920@gmail.com"
+        - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
+          value: "true"
+        - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
+          value: "true"
+        - name: SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE
+          value: "10MB"
+        - name: SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE
+          value: "10MB"
+        - name: DEBUG
+          value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecom-app-service
+spec:
+  selector:
+    app: ecom-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

@@ -1,0 +1,90 @@
+<html th:replace="admin_base::layout(~{::section})">
+	<head>
+		
+	</head>
+	<body>
+		<section>
+			<!-- Form Start -->
+			      <div class="container-fluid pt-4 px-4">
+			          <div class="row g-4">
+			              <div class="col-sm-12 col-xl-10">
+			                  <div class="bg-light rounded h-100 p-4">
+			                      <h6 class="mb-4">Horizontal Form</h6>
+			                      <form th:action="@{/ADMIN/register_admin}" method="post" enctype="multipart/form-data">
+									
+									<div class="row mb-3">
+										<label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+										<div class="col-sm-10">
+										<input type="text" class="form-control" id="inputEmail3" name="name">
+									</div>
+									</div>
+									<div class="row mb-3">
+										 <label for="inputEmail3" class="col-sm-2 col-form-label">Address</label>
+										<div class="col-sm-10">
+										 <input type="text" class="form-control" id="inputEmail3" name="address">
+									</div></div>
+									<div class="row mb-3">
+										<label for="inputEmail3" class="col-sm-2 col-form-label">Phone</label>
+										 <div class="col-sm-10">
+										  <input type="text" class="form-control" id="inputEmail3" name="phone">
+									</div></div>
+			                          <div class="row mb-3">
+			                              <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+			                              <div class="col-sm-10">
+			                                  <input type="email" class="form-control" id="inputEmail3" name="email">
+			                              </div>
+			                          </div>
+			                          <div class="row mb-3">
+			                              <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
+			                              <div class="col-sm-10">
+			                                  <input type="password" class="form-control" id="inputPassword3" name="password">
+			                              </div>
+			                          </div>
+			                          <fieldset class="row mb-3">
+			                              <legend class="col-form-label col-sm-2 pt-0">Gender</legend>
+			                              <div class="col-sm-10">
+			                                  <div class="form-check">
+			                                      <input class="form-check-input" type="radio" name="gender"
+			                                          id="gridRadios1" value="male" checked>
+			                                      <label class="form-check-label" for="gridRadios1">
+			                                          Male
+			                                      </label>
+			                                  </div>
+			                                  <div class="form-check">
+			                                      <input class="form-check-input" type="radio" name="gender"
+			                                          id="gridRadios2" value="female">
+			                                      <label class="form-check-label" for="gridRadios2">
+			                                          Female
+			                                      </label>
+			                                  </div>
+			                              </div>
+			                          </fieldset>
+										  <div class="mb-3">
+											  <label for="formFile" class="col-sm-2 col-form-label">Upload Profile</label>
+												<input class="form-control" type="file" id="formFile" name="image">
+											</div>
+			                         <!-- <div class="row mb-3">
+			                              <legend class="col-form-label col-sm-2 pt-0">Checkbox</legend>
+			                              <div class="col-sm-10">
+			                                  <div class="form-check">
+			                                      <input class="form-check-input" type="checkbox" id="gridCheck1">
+			                                      <label class="form-check-label" for="gridCheck1">
+			                                          Check me out
+			                                      </label>
+			                                  </div>
+			                              </div>
+			                          </div>-->
+			                          <button type="submit" class="btn btn-primary">Sign in</button>
+			                      </form>
+			                  </div>
+			              </div>
+			              
+			             
+			              
+			           
+			          </div>
+			      </div>
+			      <!-- Form End -->
+		</section>
+	</body>
+</html>

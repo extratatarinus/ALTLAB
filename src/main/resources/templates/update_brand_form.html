@@ -1,0 +1,31 @@
+<html th:replace="admin_base::layout(~{::section})">
+
+<head>
+
+</head>
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-8">
+			<div class="bg-light rounded h-80 p-4 mt-4">
+				<h6 class="mb-4">Update Brand</h6>
+				<form th:action="@{'/ADMIN/updateBrand/' +${brand.bid}}" method="post" enctype="multipart/form-data"
+					th:object="${sub}">
+					<div class="mb-3">
+						<label for="exampleInputEmail1" class="form-label">Brand Name</label>
+						<input type="text" class="form-control" name="name" th:value="${brand.bname}">
+
+					</div>
+					<div class="mb-3">
+						<label for="exampleInputPassword1" class="form-label">Image/Logo</label>
+						<input type="file" class="form-control" id="exampleInputPassword1" name="image">
+					</div>
+
+					<button type="submit" class="btn btn-primary">Update</button>
+				</form>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

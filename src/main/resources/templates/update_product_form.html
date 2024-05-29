@@ -1,0 +1,39 @@
+<html th:replace="admin_base::layout(~{::section})">
+
+<head>
+
+</head>
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-8">
+			<div class="bg-light rounded h-80 p-4 mt-4">
+				<h6 class="mb-4">Update Product</h6>
+				<form th:action="@{'/ADMIN/updateProduct/' +${product.pid}}" method="post" enctype="multipart/form-data"
+					th:object="${sub}">
+					<div class="mb-3">
+						<label for="exampleInputEmail1" class="form-label">Name</label>
+						<input type="text" class="form-control" name="name" th:value="${product.pname}">
+					</div>
+					<div class="mb-3">
+						<label for="exampleInputEmail1" class="form-label">Price</label>
+						<input type="text" class="form-control" name="price" th:value="${product.price}">
+					</div>
+					<div class="mb-3">
+						<label for="exampleInputEmail1" class="form-label">Description</label>
+						<textarea class="form-control" th:text="${product.description}" id="floatingTextarea"
+							style="height: 150px;" name="description"></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="exampleInputPassword1" class="form-label">Image</label>
+						<input type="file" class="form-control" id="exampleInputPassword1" name="image">
+					</div>
+
+					<button type="submit" class="btn btn-primary">Update</button>
+				</form>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>

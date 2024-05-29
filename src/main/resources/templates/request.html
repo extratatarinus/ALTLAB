@@ -1,0 +1,39 @@
+<html th:replace="admin_base::layout(~{::section})">
+	<body>
+		<section>
+			<div class="col-sm-12 col-xl-12 mt-4">
+				<div class="bg-light rounded h-80 p-4">
+												
+		
+			<h6 class="mb-4">Requests</h6>
+		  <table class="table table-striped">
+		      <thead>
+				  <tr>
+						  <th scope="col">Name</th>
+						   <th scope="col">Address</th>
+							<th scope="col">Email</th>
+							<th scope="col">Phone</th>
+							 <th scope="col">Picture</th>
+							 <th scope="col">Verify</th>
+							 <th scope="col">Reject</th>
+					</tr>
+				</thead>
+			<tbody>
+					 <tr th:each="e:${rlist}">
+						<td scope="col" th:text="${e.name}"> </td>
+						<td scope="row" th:text="${e.address}"></td>
+						<td th:text="${e.email}"></td>
+						<td th:text="${e.phone}"></td>
+						<td> <img th:src="@{'/image/'+${e.imgPath}}" style="height: 40px; width: 45px;"> </td>
+						<td> <a class="btn btn-success" th:href="@{'/ADMIN/verify/'+${e.id}}">Verify</a> </td>
+						<td> <a class="btn btn-danger" th:href="@{'/ADMIN/reject/'+${e.id}}">Reject</a> </td>
+					</tr>
+						                                   
+						                               </tbody>
+						                           </table>
+						                       </div>
+						                   </div>
+		</section>
+	</body>
+</html>
+	

@@ -1,0 +1,140 @@
+<html th:replace="Admin_base::layout(~{::section})">
+
+<head>
+
+</head>
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-10 mt-4">
+			<div class="bg-light rounded h-70 p-4">
+				<h6 class="mb-4 ">Basic Form</h6>
+				<form th:action="@{/ADMIN/add_product}" method="post" enctype="multipart/form-data">
+					<div class="mb-3">
+						<label for="exampleInputEmail1" class="form-label">Product Name</label>
+						<input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+							name="pname">
+
+					</div>
+					<div class="mb-3">
+						<label for="exampleInputPassword1" class="form-label">Price</label>
+						<input type="text" class="form-control" id="exampleInputPassword1" name="price">
+					</div>
+					
+					<label for="exampleInputPassword1" class="form-label">Category</label>
+					<div class="form-floating mb-3">
+						<select class="form-select" id="category" name="category">
+							<option value="">Select Category</option> <!-- Default option -->
+							<th:block th:each="category : ${clist}">
+								<option th:value="${category.cid}" th:text="${category.cname}"></option>
+							</th:block>
+						</select>
+					</div>
+
+					<label for="exampleInputPassword1" class="form-label">Sub Category</label>
+					<div class="form-floating mb-3">
+						<select class="form-select" id="subCategory" name="subCategory">
+							<option> Select SubCategory</option>
+						</select>
+					</div>
+					<label for="exampleInputPassword1" class="form-label">Brand</label>
+					<div class="form-floating mb-3">
+						<select class="form-select" id="brand" name="brand">
+							<option> Select Brand</option>
+						</select>
+					</div>
+					<label for="exampleInputPassword1" class="form-label">Description</label>
+					<div class="form-floating mb-4">
+
+						<textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"
+							style="height: 150px;" name="description"></textarea>
+						<label for="floatingTextarea">Description</label>
+					</div>
+					<div class="mb-3">
+						<label for="formFileLg" class="form-label">Upload Image</label>
+						<input class="form-control form-control-lg" id="formFileLg" type="file" name="image">
+					</div>
+					<button type="submit" class="btn btn-primary">Update</button>
+				</form>
+			</div>
+		</div>
+
+		<script>
+			/*$(document).ready(function () {
+				$('#category').change(function () {
+					var categoryId = $(this).val(); // Get the selected category ID
+					if (categoryId) {
+						$.ajax({
+							url: '/ADMIN/subCategories', // URL for the AJAX request
+							data: {categoryId: categoryId}, // Query parameter to send to the server
+							success: function (data) {
+								var subcategorySelect = $('#subCategory');
+								subcategorySelect.empty(); // Clear the existing options
+								data.forEach(function (sub) {
+									var option = $('<option>'); // Create a new <option>
+									option.val(sub.subId); // Set the value
+									option.text(sub.subName); // Set the displayed text
+									subcategorySelect.append(option); // Append the option to the dropdown
+								});
+							}
+						});
+					} else {
+						$('#subCategory').empty().append($('<option>').val('').text('Select Subcategory'));
+					}
+				});
+			});*/
+			$(document).ready(function () {
+				// Event handler for category change
+				$('#category').change(function () {
+					var categoryId = $(this).val(); // Get the selected category ID
+					if (categoryId) {
+						$.ajax({
+							url: '/ADMIN/subCategories', // URL for the AJAX request to fetch subcategories
+							data: {categoryId: categoryId}, // Query parameter to send to the server
+							success: function (data) {
+								var subcategorySelect = $('#subCategory');
+								subcategorySelect.empty(); // Clear the existing options
+								subcategorySelect.append($('<option>').val('').text('Select a subcategory'));
+								data.forEach(function (sub) {
+									var option = $('<option>'); // Create a new <option>
+									option.val(sub.subId); // Set the value
+									option.text(sub.subName); // Set the displayed text
+									subcategorySelect.append(option); // Append the option to the dropdown
+								});
+							}
+						});
+					} else {
+						$('#subCategory').empty().append($('<option>').val('').text('Select Subcategory'));
+					}
+				});
+
+				// Event handler for subcategory change
+				$('#subCategory').change(function () {
+					var subcategoryId = $(this).val(); // Get the selected subcategory ID
+					if (subcategoryId) {
+						$.ajax({
+							url: '/ADMIN/brand', // URL for the AJAX request to fetch brands
+							data: {subCategoryId: subcategoryId}, // Query parameter to send to the server
+							success: function (data) {
+								var brandSelect = $('#brand');
+								brandSelect.empty(); // Clear the existing options
+								brandSelect.append($('<option>').val('').text('Select brand'));
+								data.forEach(function (brand) {
+									var option = $('<option>'); // Create a new <option>
+									option.val(brand.bid); // Set the value
+									option.text(brand.bname); // Set the displayed text
+									brandSelect.append(option); // Append the option to the dropdown
+								});
+							}
+						});
+					} else {
+						$('#brand').empty().append($('<option>').val('').text('Select Brand'));
+					}
+				});
+			});
+
+		</script>
+	</section>
+</body>
+
+</html>

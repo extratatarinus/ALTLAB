@@ -1,0 +1,103 @@
+<!-- dropdowns.html 
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Double Dropdown Filter</title>
+    <script>
+        function loadSubcategories() {
+            const categorySelect = document.getElementById("categorySelect");
+            const subcategorySelect = document.getElementById("subcategorySelect");
+            const categoryId = categorySelect.value;
+			
+
+            if (categoryId==102) {
+                fetch(`/ADMIN/subCategories?categoryId=${categoryId}`)
+                    .then(response => response.json())
+                    .then(subcategories => {
+                        subcategorySelect.innerHTML = "";
+                        subcategories.forEach(sub => {
+                            const option = document.createElement("option");
+                            option.value = sub.subId;
+                            option.text = sub.subName;
+                            //subcategorySelect.appendChild(option);
+                        });
+                    });
+            } else {
+                subcategorySelect.innerHTML = "<option value=''>Select</option>";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Double Dropdown Filter</h2>
+
+    <div>
+        <label for="categorySelect">Select Category:</label>
+        <select id="categorySelect" onchange="loadSubcategories()">
+            <option value="">Select Category</option>
+            <th:block th:each="category : ${clist}">
+                <option th:value="${category.cid}" th:text="${category.cname}"></option>
+            </th:block>
+        </select>
+    </div>
+
+    <div>
+        <label for="subcategorySelect">Select Subcategory:</label>
+        <select id="subcategorySelect">
+       
+        </select>
+    </div>
+</body>
+</html>-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Category-Subcategory Selector</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery -->
+    <script>
+        $(document).ready(function() {
+            $('#categorySelect').change(function() {
+                var categoryId = $(this).val(); // Get the selected category ID
+                if (categoryId) {
+                    $.ajax({
+                        url: '/ADMIN/subCategories', // URL for the AJAX request
+                        data: { categoryId: categoryId }, // Query parameter to send to the server
+                        success: function(data) {
+                            var subcategorySelect = $('#subcategorySelect');
+                            subcategorySelect.empty(); // Clear the existing options
+                            data.forEach(function(sub) {
+                                var option = $('<option>'); // Create a new <option>
+                                option.val(sub.subId); // Set the value
+                                option.text(sub.subName); // Set the displayed text
+                                subcategorySelect.append(option); // Append the option to the dropdown
+                            });
+                        }
+                    });
+                } else {
+                    $('#subcategorySelect').empty().append($('<option>').val('').text('Select Subcategory'));
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>Category-Subcategory Selector</h2>
+
+    <div>
+        <label for="categorySelect">Category:</label>
+        <select id="categorySelect">
+            <option value="">Select Category</option> <!-- Default option -->
+            <th:block th:each="category : ${clist}">
+                <option th:value="${category.cid}" th:text="${category.cname}"></option>
+            </th:block>
+        </select>
+    </div>
+
+    <div>
+        <label for="subcategorySelect">Subcategory:</label>
+        <select id="subcategorySelect">
+            <option value="">Select Subcategory</option> <!-- Default option -->
+        </select>
+    </div>
+</body>
+</html>

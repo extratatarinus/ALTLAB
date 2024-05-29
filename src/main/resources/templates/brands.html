@@ -1,0 +1,64 @@
+<html th:replace="admin_base::layout(~{::section})">
+
+<head>
+</head>
+
+<body>
+	<section>
+		<div class="col-sm-12 col-xl-12 mt-4">
+			<div class="bg-light rounded h-80 p-4">
+				<div class="col-sm-12 col-xl-4">
+					<div class="bg-light rounded h-20 p-1">
+						<h6 class="mb-2">Add Brand</h6>
+						<form th:action="@{/ADMIN/add_brand}" method="post" enctype="multipart/form-data">
+							<div class="mb-3">
+								<label for="name">Name</label>
+								<input type="text" class="form-control" id="exampleInputEmail1"
+									aria-describedby="emailHelp" name="name">
+							</div>
+							<div class="mb-3">
+								<label for="image">Image</label>
+								<input type="file" class="form-control" id="imgFile" aria-describedby="emailHelp"
+									name="image">
+
+							</div>
+
+							<button type="submit" class="btn btn-primary">Add</button>
+						</form>
+					</div>
+				</div>
+				<h6 class="mb-4">Categories</h6>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col"> Id</th>
+							<th scope="col">Name</th>
+							<th>Image</th>
+							<th>Products</th>
+							<th>Update</th>
+							<th>Delete</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="e:${blist}">
+							<th scope="row" th:text="${e.bid}"></th>
+							<td th:text="${e.bname}"></td>
+							<td> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;"> </td>
+							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/products/' +${e.bid}}">products</a>
+							</td>
+							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/update_brand_form/' +${e.bid}}">Update</a>
+							</td>
+							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/delete_brand/' +${e.bid}}">Delete</a>
+							</td>
+
+
+						</tr>
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+</body>
+
+</html>
