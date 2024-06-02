@@ -1,6 +1,6 @@
 package com.example.demo.Entity;
 
-	import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,93 +15,88 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class subCategory {
-	
-	
-	@Id
-	private String subId;
-	
-	private String subName;
-	
-	private LocalDateTime createdAt;
-	
-	@Column(name = "imgPath")
-	private String imgPath;
-	
-	
-	@OneToMany(mappedBy = "subCategory",cascade = CascadeType.ALL)
-	public List<Brand> brand;
-	
-	
-	
-	
-	public String getImgPath() {
-		return imgPath;
-	}
 
-	public void setImgPath(String imgPath) {
-		this.imgPath = imgPath;
-	}
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    @Id
+    private String subId;
 
-	public void setCreatedAt(LocalDateTime localDate) {
-		this.createdAt = localDate;
-	}
+    private String subName;
 
-	@ManyToOne
-	@JoinColumn(name = "cid", referencedColumnName = "cid")
-	@JsonIgnore
-	private category category;
+    private LocalDateTime createdAt;
 
-	public String getSubId() {
-		return subId;
-	}
+    @Column(name = "imgPath")
+    private String imgPath;
 
-	public void setSubId(String subId) {
-		this.subId = subId;
-	}
 
-	public String getSubName() {
-		return subName;
-	}
+    @OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL)
+    public List<Brand> brand;
 
-	public void setSubName(String subName) {
-		this.subName = subName;
-	}
 
-	public category getCategory() {
-		return category;
-	}
+    public String getImgPath() {
+        return imgPath;
+    }
 
-	public void setCategory(category category) {
-		this.category = category;
-	}
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
 
-	public subCategory() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public subCategory(String subId, String subName, com.example.demo.Entity.category category,LocalDateTime createdAt,
-			String imgPath) {
-		super();
-		this.subId = subId;
-		this.subName = subName;
-		this.category = category;
-		this.createdAt=createdAt;
-		this.imgPath=imgPath;
-	}
+    public void setCreatedAt(LocalDateTime localDate) {
+        this.createdAt = localDate;
+    }
 
-	@Override
-	public String toString() {
-		return "subCategory [subId=" + subId + ", subName=" + subName + ", createdAt=" + createdAt + ", category="
-				+ category + "]";
-	}
-	
-	
-	
-	
+    @ManyToOne
+    @JoinColumn(name = "cid", referencedColumnName = "cid")
+    @JsonIgnore
+    private category category;
+
+    public String getSubId() {
+        return subId;
+    }
+
+    public void setSubId(String subId) {
+        this.subId = subId;
+    }
+
+    public String getSubName() {
+        return subName;
+    }
+
+    public void setSubName(String subName) {
+        this.subName = subName;
+    }
+
+    public category getCategory() {
+        return category;
+    }
+
+    public void setCategory(category category) {
+        this.category = category;
+    }
+
+    public subCategory() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    public subCategory(String subId, String subName, com.example.demo.Entity.category category, LocalDateTime createdAt,
+                       String imgPath) {
+        super();
+        this.subId = subId;
+        this.subName = subName;
+        this.category = category;
+        this.createdAt = createdAt;
+        this.imgPath = imgPath;
+    }
+
+    @Override
+    public String toString() {
+        return "subCategory [subId=" + subId + ", subName=" + subName + ", createdAt=" + createdAt + ", category="
+                + category + "]";
+    }
+
 
 }

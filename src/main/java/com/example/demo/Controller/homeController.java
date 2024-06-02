@@ -19,26 +19,33 @@ import ch.qos.logback.core.model.Model;
 @Controller
 @RequestMapping("/")
 public class homeController {
-	@Autowired
-	private homService service;
-	
-	@GetMapping("/index")
-	public String home() {
-		return "home";
-	}
-	@GetMapping("/login")
-	public String login() {
-		return "login";
-	}
-	@GetMapping("/signup")
-	public String signup() {
-		return "register";
-	}
 
-	@PostMapping("/register")
-	public String register(Model model,@ModelAttribute User u,@RequestParam("image")MultipartFile file) throws IllegalStateException, IOException {
-		service.register(u,file);
-		return "login";
-	}
+    private final homService service;
+
+    public homeController(homService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/index")
+    public String home() {
+        return "home";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String register(Model model, @ModelAttribute User u, @RequestParam("image") MultipartFile file) throws IllegalStateException, IOException {
+        service.register(u, file);
+        return "login";
+    }
+
 
 }

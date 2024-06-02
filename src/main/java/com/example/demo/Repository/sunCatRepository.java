@@ -1,5 +1,6 @@
 package com.example.demo.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,6 @@ public interface sunCatRepository extends JpaRepository<subCategory, String> {
 	@Modifying
 	@Query("delete  from subCategory s where s.category.cid= :cid")
 	public void deleteByCid(@Param("cid")int cid);
+
+	List<subCategory> findByCategoryCid(int cid);
 }

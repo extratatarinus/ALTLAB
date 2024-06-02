@@ -1,33 +1,81 @@
 <html th:replace="user_base::layout(~{::section})">
+<head>
 
+</head>
 <body>
 	<section class="py-4">
-		<div class="container px-4 px-lg-5 mt-5">
-			<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-				<div class="col mb-5" th:each="e:${products}">
-					<div class="card h-100">
-						<!-- Product image-->
-						<img class="card-img-top" th:src="@{'/image/' +${e.imgPath}}" alt="..." style="height: 160px;" />
-						<!-- Product details-->
-						<div class="card-body pb-2">
-							<div class="text-center">
-								<!-- Product name-->
-								<h5 class="fw-bolder" th:text="${e.pname}"></h5>
-								<!-- Product price-->
-								<span th:text="${e.price}"></span>
-							</div>
-						</div>
-						<!-- Product actions-->
-						<div class="card-footer p-3 pt-0 border-top-0 bg-transparent">
-							<div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View
-									options</a></div>
-						</div>
-					</div>
+
+		<!-- Breadcrumb Start -->
+		<div class="container-fluid">
+			<div class="row px-xl-5">
+				<div class="col-12">
+					<nav class="breadcrumb bg-light mb-30">
+						<a class="breadcrumb-item text-dark" th:href="@{/USER/home}">Главная</a>
+						<a class="breadcrumb-item text-dark" >Категории</a>
+						<a class="breadcrumb-item text-dark" th:text="${curCat.cname}" ></a>
+						<span class="breadcrumb-item active" th:text="${curSubCat.subName}"></span>
+					</nav>
 				</div>
-
-
 			</div>
 		</div>
+		<!-- Breadcrumb End -->
+
+		<!-- Shop Start -->
+		<div class="container-fluid">
+			<div class="row px-xl-5">
+
+				<!-- Shop Product Start -->
+				<div class="container px-4 px-lg-5 mt-5">
+					<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+						<div class="col-lg-4 col-md-6 col-sm-6 pb-1" th:each="e:${products}">
+							<div class="product-item bg-light mb-4">
+								<div class="product-img position-relative overflow-hidden">
+									<img class="img-fluid w-100" th:src="@{'/image/' +${e.imgPath}}" alt="">
+									<div class="product-action">
+										<a class="btn btn-outline-dark btn-square" href=""><i
+												class="fa fa-shopping-cart"></i></a>
+										<a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+										<a class="btn btn-outline-dark btn-square" href=""><i
+												class="fa fa-sync-alt"></i></a>
+										<a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
+									</div>
+								</div>
+								<div class="text-center py-4">
+									<a class="h6 text-decoration-none text-truncate" th:text="${e.pname}" href=""></a>
+									<div class="d-flex align-items-center justify-content-center mt-2">
+										<h5><span th:text="${e.price}"></span></h5>
+										<h6 class="text-muted ml-2">
+											<del></del>
+										</h6>
+									</div>
+									<div class="d-flex align-items-center justify-content-center mb-1">
+										<small class="fa fa-star text-primary mr-1"></small>
+										<small class="fa fa-star text-primary mr-1"></small>
+										<small class="fa fa-star text-primary mr-1"></small>
+										<small class="far fa-star text-primary mr-1"></small>
+										<small class="far fa-star text-primary mr-1"></small>
+										<small>(99)</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12">
+						<nav>
+							<ul class="pagination justify-content-center">
+								<li class="page-item disabled"><a class="page-link" href="#">Previous</span></a></li>
+								<li class="page-item active"><a class="page-link" href="#">1</a></li>
+								<li class="page-item"><a class="page-link" href="#">2</a></li>
+								<li class="page-item"><a class="page-link" href="#">3</a></li>
+								<li class="page-item"><a class="page-link" href="#">Next</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+				<!-- Shop Product End -->
+			</div>
+		</div>
+		<!-- Shop End -->
 	</section>
 </body>
 

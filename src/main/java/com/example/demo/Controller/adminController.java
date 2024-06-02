@@ -30,8 +30,11 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/ADMIN")
 public class adminController {
 
-	@Autowired
-	private adminService aservice;
+	private final adminService aservice;
+
+	public adminController(adminService aservice) {
+		this.aservice = aservice;
+	}
 
 	@GetMapping("/home")
 	public String home(Model model, Principal principal, HttpSession session) {

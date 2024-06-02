@@ -11,144 +11,138 @@ import jakarta.persistence.OneToMany;
 
 @Entity
 public class User {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
-	
-	private String name;
-	
-	private String address;
-	
-	private String email;
-	
-	private String password;
-	
-	private String role;
-	
-	private String phone;
-	
-	private String imgPath;
-	
-	private String status;
-	
-	
-	
-	@OneToMany(mappedBy = "pid",cascade = CascadeType.ALL )
-	public Set<product> product;
 
-	
-	
-	
-	public String getStatus() {
-		return status;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    private String name;
 
-	public int getId() {
-		return id;
-	}
+    private String address;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    private String email;
 
-	public String getName() {
-		return name;
-	}
+    private String password;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private String role;
 
-	public String getAddress() {
-		return address;
-	}
+    private String phone;
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    private String imgPath;
 
-	public String getEmail() {
-		return email;
-	}
+    private String status;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
 
-	public String getPassword() {
-		return password;
-	}
+    @OneToMany(mappedBy = "pid", cascade = CascadeType.ALL)
+    public Set<product> product;
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
-	public String getRole() {
-		return role;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setRole(String role) {
-		this.role = role;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public String getPhone() {
-		return phone;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getImgPath() {
-		return imgPath;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setImgPath(String imgPath) {
-		this.imgPath = imgPath;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	
+    public String getAddress() {
+        return address;
+    }
 
-	public Set<product> getProduct() {
-		return product;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public void setProduct(Set<product> product) {
-		this.product = product;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", address=" + address + ", email=" + email + ", password="
-				+ password + ", role=" + role + ", phone=" + phone + ", imgPath=" + imgPath + ", product=" + product + "]";
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public User(int id, String name, String address, String email, String password, String role, String phone,
-			String imgPath ,String status, Set<com.example.demo.Entity.product> product) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.address = address;
-		this.email = email;
-		this.password = password;
-		this.role = role;
-		this.phone = phone;
-		this.imgPath = imgPath;
-		this.product = product;
-		this.status=status;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public User() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+
+    public Set<product> getProduct() {
+        return product;
+    }
+
+    public void setProduct(Set<product> product) {
+        this.product = product;
+    }
+
+    @Override
+    public String toString() {
+        return "User [id=" + id + ", name=" + name + ", address=" + address + ", email=" + email + ", password="
+                + password + ", role=" + role + ", phone=" + phone + ", imgPath=" + imgPath + ", product=" + product + "]";
+    }
+
+    public User(int id, String name, String address, String email, String password, String role, String phone,
+                String imgPath, String status, Set<com.example.demo.Entity.product> product) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.phone = phone;
+        this.imgPath = imgPath;
+        this.product = product;
+        this.status = status;
+    }
+
+    public User() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
 
 }
