@@ -16,7 +16,6 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class subCategory {
 
-
     @Id
     private String subId;
 
@@ -27,10 +26,8 @@ public class subCategory {
     @Column(name = "imgPath")
     private String imgPath;
 
-
     @OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL)
     public List<Brand> brand;
-
 
     public String getImgPath() {
         return imgPath;

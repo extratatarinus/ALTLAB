@@ -2,6 +2,8 @@ package com.example.demo.Repository;
 
 import java.util.List;
 
+import com.example.demo.Entity.category;
+import com.example.demo.Entity.subCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,5 +43,11 @@ public interface productRepository extends JpaRepository<product, String> {
 
     @Query("SELECT COUNT(p) FROM product p WHERE p.brand.subCategory.subId = :subCategoryId")
     int countByBrandSubCategorySubId(@Param("subCategoryId") String subCategoryId);
+
+    @Query("SELECT p.brand.subCategory.category FROM product p WHERE p.pid = :pid")
+    category findCategoryByProductId(@Param("pid") String pid);
+
+    @Query("SELECT p.brand.subCategory FROM product p WHERE p.pid = :pid")
+    subCategory findSubCategoryByProductId(@Param("pid") String pid);
 
 }

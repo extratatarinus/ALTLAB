@@ -2,12 +2,7 @@ package com.example.demo.Entity;
 
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 @Entity
 public class User {
@@ -32,10 +27,41 @@ public class User {
 
     private String status;
 
+    public Favorite getFavoriteList() {
+        return favoriteList;
+    }
+
+    public void setFavoriteList(Favorite favoriteList) {
+        this.favoriteList = favoriteList;
+    }
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Favorite favoriteList;
 
     @OneToMany(mappedBy = "pid", cascade = CascadeType.ALL)
     public Set<product> product;
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private Set<Reviews> reviews;
+
+    public Set<Reviews> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<Reviews> reviews) {
+        this.reviews = reviews;
+    }
 
     public String getStatus() {
         return status;

@@ -7,24 +7,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.demo.Entity.*;
 import com.example.demo.Repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.Entity.Brand;
-import com.example.demo.Entity.User;
-import com.example.demo.Entity.category;
-import com.example.demo.Entity.product;
-import com.example.demo.Entity.subCategory;
-
 import jakarta.transaction.Transactional;
 
 @Component
 public class adminService {
+
+    private final reviewsRepository rrepo;
 
     private final JavaMailSender jms;
 
@@ -38,14 +34,21 @@ public class adminService {
 
     private final brandRepository brepo;
 
-	public adminService(JavaMailSender jms, userRepository urepo, catRepository crepo, productRepository prepo, sunCatRepository srepo, brandRepository brepo) {
+	public adminService(JavaMailSender jms,
+                        userRepository urepo,
+                        catRepository crepo,
+                        productRepository prepo,
+                        sunCatRepository srepo,
+                        brandRepository brepo,
+                        reviewsRepository rrepo) {
 		this.jms = jms;
 		this.urepo = urepo;
 		this.crepo = crepo;
 		this.prepo = prepo;
 		this.srepo = srepo;
 		this.brepo = brepo;
-	}
+        this.rrepo = rrepo;
+    }
 
 	public User findByEmail(String email) {
         return urepo.findByEmail(email);
@@ -380,14 +383,6 @@ public class adminService {
 		return srepo.findByCategoryCid(categoryId);
 	}
 
-    /*public List<product> findProductsByCategoryIds(List<Integer> categoryIds) {
-        return prepo.findProductsByCategoryIds(categoryIds);
-    }
-
-    public List<product> findProductsBySubCategoryIds(List<Integer> subCategoryIds) {
-        return prepo.findProductsBySubCategoryIds(subCategoryIds);
-    }*/
-
     public List<product> findProductsBySubCategoryIds(List<String> subCategoryIds) {
         return prepo.findByBrandSubCategorySubIdIn(subCategoryIds);
     }
@@ -405,6 +400,23 @@ public class adminService {
         return prepo.countByBrandSubCategorySubId(subCategoryId);
     }
 
+    public category findCategoryByProductId(String pid) {
+        return prepo.findCategoryByProductId(pid);
+    }
+
+    public subCategory findSubCategoryByProductId(String pid) {
+        return prepo.findSubCategoryByProductId(pid);
+    }
+
+    public List<Reviews> getReviewsByProductId(String productId) {
+        return rrepo.findByProductId(productId);
+    }
+
+    public void addReviewToProduct(String productId, Reviews review) {
+        product product = prepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        review.setProduct(product);
+        rrepo.save(review);
+    }
 
 }
 

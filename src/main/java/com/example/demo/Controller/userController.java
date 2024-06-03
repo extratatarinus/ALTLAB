@@ -3,21 +3,15 @@ package com.example.demo.Controller;
 import java.security.Principal;
 import java.util.*;
 
-import com.example.demo.Entity.category;
-import com.example.demo.Entity.product;
-import com.example.demo.Entity.subCategory;
+import com.example.demo.Entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.Entity.User;
 import com.example.demo.service.adminService;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/USER")
@@ -179,6 +173,30 @@ public class userController {
     @GetMapping("/favorites")
     public String favorites(Model model, HttpSession session, Principal principal) {
         return getCurrentUser(model, session, principal, "favorites");
+    }
+
+    @GetMapping("/detail/{id}")
+    public String productDetails(@PathVariable("id") String pId, Model model, Principal principal, HttpSession session) {
+
+        model.addAttribute("products", aservice.getAllProduct());
+        model.addAttribute("product", aservice.findProductById(pId));
+        model.addAttribute("category", aservice.findCategoryByProductId(pId));
+        model.addAttribute("subCategory", aservice.findSubCategoryByProductId(pId));
+        model.addAttribute("reviews", aservice.getReviewsByProductId(pId));
+        model.addAttribute("currentUser", aservice.findByEmail(principal.getName()));
+
+        return getCurrentUser(model, session, principal, "detail");
+    }
+
+    @PostMapping("/detail/{id}/addReview")
+    public String addReviewToProduct(@PathVariable("id") String pId, @RequestParam String text, Principal principal) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        Reviews review = new Reviews();
+        review.setText(text);
+        review.setAuthor(currentUser);
+
+        aservice.addReviewToProduct(pId, review);
+        return "redirect:/USER/detail/" + pId;
     }
 }
 

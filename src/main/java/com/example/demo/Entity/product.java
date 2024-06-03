@@ -1,12 +1,9 @@
 package com.example.demo.Entity;
 
-
 import java.time.LocalDate;
+import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class product {
@@ -26,13 +23,46 @@ public class product {
 
     private LocalDate addDate;
 
+    private String shortDescription;
+
+    private String Information;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Reviews> reviews;
 
     @ManyToOne
     @JoinColumn(name = "bid")
     private Brand brand;
 
+    public List<Favorite> getFavoriteLists() {
+        return favoriteLists;
+    }
+
+    public void setFavoriteLists(List<Favorite> favoriteLists) {
+        this.favoriteLists = favoriteLists;
+    }
+
+    public String getInformation() {
+        return Information;
+    }
+
+    public void setInformation(String information) {
+        Information = information;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
+
+    @ManyToMany(mappedBy = "products")
+    private List<Favorite> favoriteLists;
+
     public product(String pid, String pname, String description, String imgPath, String price,
-                   LocalDate addDate, String status, Brand brand, User u) {
+                   LocalDate addDate, String status, Brand brand) {
         super();
         this.pid = pid;
         this.pname = pname;
@@ -42,109 +72,81 @@ public class product {
         this.status = status;
         this.addDate = addDate;
         this.brand = brand;
-        this.u = u;
     }
-
 
     public String getStatus() {
         return status;
     }
 
-
     public void setStatus(String status) {
         this.status = status;
     }
-
 
     public String getPid() {
         return pid;
     }
 
-
     public void setPid(String pid) {
         this.pid = pid;
     }
-
 
     public String getPname() {
         return pname;
     }
 
-
     public void setPname(String pname) {
         this.pname = pname;
     }
-
 
     public String getDescription() {
         return description;
     }
 
-
     public void setDescription(String description) {
         this.description = description;
     }
-
 
     public String getImgPath() {
         return imgPath;
     }
 
-
     public void setImgPath(String imgPath) {
         this.imgPath = imgPath;
     }
-
 
     public String getPrice() {
         return price;
     }
 
-
     public void setPrice(String price) {
         this.price = price;
     }
-
 
     public LocalDate getAddDate() {
         return addDate;
     }
 
-
     public void setAddDate(LocalDate addDate) {
         this.addDate = addDate;
     }
-
 
     public Brand getBrand() {
         return brand;
     }
 
-
     public void setBrand(Brand brand) {
         this.brand = brand;
     }
 
-
-    public User getU() {
-        return u;
+    public List<Reviews> getReviews() {
+        return reviews;
     }
 
-
-    public void setU(User u) {
-        this.u = u;
+    public void setReviews(List<Reviews> reviews) {
+        this.reviews = reviews;
     }
-
-
-    @ManyToOne
-    @JoinColumn(name = "uid")
-    private User u;
-
 
     public product() {
         super();
-        // TODO Auto-generated constructor stub
     }
-
-
 }
