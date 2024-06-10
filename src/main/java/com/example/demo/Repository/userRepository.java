@@ -11,19 +11,19 @@ import com.example.demo.Entity.User;
 
 public interface userRepository extends JpaRepository<User, Integer> {
 	
-	public User findByEmail(String email);
+	User findByEmail(String email);
 	
-	public List<User> findByStatus(String status);
+	List<User> findByStatus(String status);
 	
 	@Modifying
 	@Query("update User u set u.status= :status where u.id= :id")
-	public void verify(@Param("status")String status,@Param("id")int id);
+	void verify(@Param("status")String status,@Param("id")int id);
 	
-	public List<User> findByRole(String role);
+	List<User> findByRole(String role);
 	
 	@Modifying
 	@Query("update User s set s.name= :name, s.address= :address , s.email= :email, s.phone= :phone where s.id= :id")
-	public void updateUser(@Param("name")String name,@Param("address")String address,@Param("email")String email,
+	void updateUser(@Param("name")String name,@Param("address")String address,@Param("email")String email,
 			@Param("phone")String phone,@Param("id")int id);
 
 }

@@ -9,7 +9,8 @@ import jakarta.persistence.*;
 public class product {
 
     @Id
-    private String pid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long pid;
 
     private String pname;
 
@@ -26,6 +27,16 @@ public class product {
     private String shortDescription;
 
     private String Information;
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    private int quantity;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Reviews> reviews;
@@ -61,7 +72,7 @@ public class product {
     @ManyToMany(mappedBy = "products")
     private List<Favorite> favoriteLists;
 
-    public product(String pid, String pname, String description, String imgPath, String price,
+    public product(Long pid, String pname, String description, String imgPath, String price,
                    LocalDate addDate, String status, Brand brand) {
         super();
         this.pid = pid;
@@ -82,11 +93,11 @@ public class product {
         this.status = status;
     }
 
-    public String getPid() {
+    public Long getPid() {
         return pid;
     }
 
-    public void setPid(String pid) {
+    public void setPid(Long pid) {
         this.pid = pid;
     }
 

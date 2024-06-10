@@ -44,11 +44,11 @@
 							<th scope="row" th:text="${e.bid}"></th>
 							<td th:text="${e.bname}"></td>
 							<td> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;"> </td>
-							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/products/' +${e.bid}}">products</a>
+							<td> <a class="btn btn-primary" th:action="@{'/ADMIN/products/' +${e.bid}}" methods="post">products</a>
 							</td>
-							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/update_brand_form/' +${e.bid}}">Update</a>
+							<td> <a class="btn btn-primary" th:action="@{'/ADMIN/update_brand_form/' +${e.bid}}" methods="post">Update</a>
 							</td>
-							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/delete_brand/' +${e.bid}}">Delete</a>
+							<td> <a class="btn btn-danger"  th:action="@{'/ADMIN/delete_brand/' +${e.bid}}" methods="post">Delete</a>
 							</td>
 
 

@@ -5,6 +5,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.security.Principal;
 import java.util.List;
 
+import com.example.demo.Entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.Entity.Brand;
-import com.example.demo.Entity.User;
-import com.example.demo.Entity.product;
-import com.example.demo.Entity.subCategory;
 import com.example.demo.service.adminService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -217,13 +214,13 @@ public class adminController {
 	}
 
 	@PostMapping("/add_brand")
-	public void add_brand(@RequestParam("name") String name, @RequestParam("image") MultipartFile file, Model model,
+	public String add_brand(@RequestParam("name") String name, @RequestParam("image") MultipartFile file, Model model,
 			HttpSession session, HttpServletResponse response) throws IllegalStateException, IOException {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
 		String subId = (String) session.getAttribute("subId");
 		aservice.addBrand(name, subId, file);
-		response.sendRedirect("/ADMIN/brands/" + subId);
+		return "redirect:/ADMIN/brands/" + subId;
 	}
 
 	@GetMapping("/brand")
@@ -243,25 +240,25 @@ public class adminController {
 	}
 
 	@PostMapping("/updateBrand/{bid}")
-	public void updateBrand(@PathVariable("bid") String bid, @RequestParam("name") String name,
+	public String updateBrand(@PathVariable("bid") String bid, @RequestParam("name") String name,
 			@RequestParam("image") MultipartFile file, Model model, HttpSession session, HttpServletResponse response)
 			throws IllegalStateException, IOException {
 		aservice.updateBrand(name, file, bid);
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		response.sendRedirect("/ADMIN/brands/" + session.getAttribute("subID"));
+		return "redirect:/ADMIN/brands/" + session.getAttribute("subID");
 	}
 
-	@GetMapping("/delete_brand/{id}")
-	public void deleteBrand(@PathVariable("id") String bid, Model model, HttpSession session,
+	@PostMapping("/delete_brand/{id}")
+	public String deleteBrand(@PathVariable("id") String bid, Model model, HttpSession session,
 			HttpServletResponse response) throws IOException {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		String subID = aservice.findBrandById(bid).getSubCategory().getSubId();
+		String subID = aservice.findSubCategoryByBrandId(bid).getSubId();
 		aservice.deleteBrand(bid);
-		response.sendRedirect("/ADMIN/brands/" + subID);
+		return "redirect:/ADMIN/brands/" + subID;
 	}
 
 	@GetMapping("/request")
@@ -283,7 +280,7 @@ public class adminController {
 	}
 	
 	@GetMapping("/update_product_form/{id}")
-	public String update_product_form( @PathVariable("id")String id  ,Model model,HttpSession session) {
+	public String update_product_form( @PathVariable("id")Long id  ,Model model,HttpSession session) {
 		model.addAttribute("product", aservice.findProductById(id));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		model.addAttribute("user", session.getAttribute("user"));
@@ -292,14 +289,14 @@ public class adminController {
 	}
 	
 	@PostMapping("/updateProduct/{id}")
-	public void updateProduct(@PathVariable("id")String id, Model model,HttpSession session,HttpServletResponse response,
+	public void updateProduct(@PathVariable("id")Long id, Model model,HttpSession session,HttpServletResponse response,
 			@RequestParam("name")String pname,@RequestParam("price")String price,@RequestParam("description")String description,
 			@RequestParam("image")MultipartFile file) throws IllegalStateException, IOException {
 		aservice.updateProduct(pname, price, description, file, id);
 		response.sendRedirect("/ADMIN/products/"+aservice.findProductById(id).getBrand().getBid());
 	}
 	@GetMapping("/delete_product/{id}")
-	public void deleteProduct(@PathVariable("id")String pid,Model model,HttpSession session,HttpServletResponse response) throws IOException {
+	public void deleteProduct(@PathVariable("id")Long pid,Model model,HttpSession session,HttpServletResponse response) throws IOException {
 		String bid=aservice.findProductById(pid).getBrand().getBid();
 		aservice.deleteProduct(pid);
 		response.sendRedirect("/ADMIN/products/"+bid);

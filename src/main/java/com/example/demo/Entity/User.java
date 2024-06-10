@@ -27,6 +27,7 @@ public class User {
 
     private String status;
 
+
     public Favorite getFavoriteList() {
         return favoriteList;
     }

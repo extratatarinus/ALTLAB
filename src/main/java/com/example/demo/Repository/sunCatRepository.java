@@ -22,13 +22,13 @@ public interface sunCatRepository extends JpaRepository<subCategory, String> {
 	
 	@Modifying
 	@Query("update subCategory s set s.subName= :sname, s.imgPath= :img where s.subId= :id")
-	public void updateSubCategory(@Param("sname")String sname,@Param("img")String imgPath,@Param("id")String id);
+	void updateSubCategory(@Param("sname")String sname,@Param("img")String imgPath,@Param("id")String id);
 	
-	public subCategory findSubCategoryBySubName(String subName);
+	subCategory findSubCategoryBySubName(String subName);
 	
 	@Modifying
 	@Query("delete  from subCategory s where s.category.cid= :cid")
-	public void deleteByCid(@Param("cid")int cid);
+	void deleteByCid(@Param("cid")int cid);
 
 	List<subCategory> findByCategoryCid(int cid);
 }

@@ -44,4 +44,5 @@ public class PromoCode {
     public void setDiscountPercentage(double discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
+
 }

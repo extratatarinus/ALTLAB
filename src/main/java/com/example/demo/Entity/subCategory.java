@@ -89,11 +89,4 @@ public class subCategory {
         this.imgPath = imgPath;
     }
 
-    @Override
-    public String toString() {
-        return "subCategory [subId=" + subId + ", subName=" + subName + ", createdAt=" + createdAt + ", category="
-                + category + "]";
-    }
-
-
 }

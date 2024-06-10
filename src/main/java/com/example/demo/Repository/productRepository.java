@@ -11,8 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.example.demo.Entity.product;
 
-
-public interface productRepository extends JpaRepository<product, String> {
+public interface productRepository extends JpaRepository<product, Long> {
 
     product findByPname(String pname);
 
@@ -27,7 +26,7 @@ public interface productRepository extends JpaRepository<product, String> {
     @Modifying
     @Query("update product p set p.pname= :pname, p.price= :price , p.description= :description,p.imgPath= :imgPath where p.pid= :pid")
     void updateProduct(@Param("pname") String pname, @Param("price") String price, @Param("description") String description,
-                       @Param("imgPath") String imgPath, @Param("pid") String pid);
+                       @Param("imgPath") String imgPath, @Param("pid") Long pid);
 
     @Query("select p from product p where p.brand.subCategory.subId= :subID")
     List<product> findProductBySubCategory(@Param("subID") String subID);
@@ -45,9 +44,9 @@ public interface productRepository extends JpaRepository<product, String> {
     int countByBrandSubCategorySubId(@Param("subCategoryId") String subCategoryId);
 
     @Query("SELECT p.brand.subCategory.category FROM product p WHERE p.pid = :pid")
-    category findCategoryByProductId(@Param("pid") String pid);
+    category findCategoryByProductId(@Param("pid") Long pid);
 
     @Query("SELECT p.brand.subCategory FROM product p WHERE p.pid = :pid")
-    subCategory findSubCategoryByProductId(@Param("pid") String pid);
+    subCategory findSubCategoryByProductId(@Param("pid") Long pid);
 
 }

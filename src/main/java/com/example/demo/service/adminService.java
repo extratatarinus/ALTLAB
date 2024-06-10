@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,14 @@ import jakarta.transaction.Transactional;
 @Component
 public class adminService {
 
+    private final CartRepository cartrepo;
+
+   /* private final OrderRepository orepo;*/
+
+    private final PromocodeRepository pcrepo;
+
+    private final favoriteRepository frepo;
+
     private final reviewsRepository rrepo;
 
     private final JavaMailSender jms;
@@ -34,23 +43,31 @@ public class adminService {
 
     private final brandRepository brepo;
 
-	public adminService(JavaMailSender jms,
+    public adminService(CartRepository cartrepo,
+                        PromocodeRepository pcrepo,
+                        JavaMailSender jms,
                         userRepository urepo,
                         catRepository crepo,
                         productRepository prepo,
                         sunCatRepository srepo,
                         brandRepository brepo,
-                        reviewsRepository rrepo) {
-		this.jms = jms;
-		this.urepo = urepo;
-		this.crepo = crepo;
-		this.prepo = prepo;
-		this.srepo = srepo;
-		this.brepo = brepo;
+                        reviewsRepository rrepo,
+                        favoriteRepository frepo/*,
+                        *//*OrderRepository orepo*/) {
+        this.cartrepo = cartrepo;
+        /*this.orepo = orepo;*/
+        this.pcrepo = pcrepo;
+        this.jms = jms;
+        this.urepo = urepo;
+        this.crepo = crepo;
+        this.prepo = prepo;
+        this.srepo = srepo;
+        this.brepo = brepo;
         this.rrepo = rrepo;
+        this.frepo = frepo;
     }
 
-	public User findByEmail(String email) {
+    public User findByEmail(String email) {
         return urepo.findByEmail(email);
     }
 
@@ -74,7 +91,6 @@ public class adminService {
         user.setRole(role);
         user.setStatus("Verified");
         urepo.save(user);
-
     }
 
     public void add_category(String cname, MultipartFile file) throws IllegalStateException, IOException {
@@ -94,7 +110,6 @@ public class adminService {
         crepo.save(c);
     }
 
-
     @Transactional
     public void updateCategory(MultipartFile file, String cname, int cid) throws IllegalStateException, IOException {
         String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
@@ -108,9 +123,7 @@ public class adminService {
             file.transferTo(new File(npath));
             crepo.updateCategory(cname, npath.substring(i + search.length()), cid);
         }
-
     }
-
 
     @Transactional
     public void deleteCategory(int cid) {
@@ -130,7 +143,6 @@ public class adminService {
 
         product p = new product();
         Brand b = brepo.findById(bid).get();
-        List<product> lp = prepo.findProductByBId(bid);
 
         if (file.isEmpty()) {
             p.setImgPath("");
@@ -138,21 +150,7 @@ public class adminService {
             file.transferTo(new File(nPath));
             p.setImgPath(nPath.substring(i + search.length()));
         }
-        //Generating ID
-        //sproduct pro=prepo.findByPname(product.getPname());
-        if (lp.isEmpty()) {
-            p.setPid(b.getBname().replaceAll("\\s", "") + 1);
-
-        } else {
-            product pp = prepo.findProductByBIdOrderByCreatedAt(bid);
-            String pid = pp.getPid();
-            String new_name = b.getBname().replace(" ", "");
-            int l = new_name.length();
-            int num = Integer.parseInt(pid.substring(l)) + 1;
-            String ppid = new_name + num;
-            p.setPid(ppid);
-
-        }
+        p.setPid(product.getPid());
         p.setBrand(b);
         p.setPname(product.getPname());
         p.setBrand(product.getBrand());
@@ -161,8 +159,6 @@ public class adminService {
         p.setAddDate(LocalDate.now());
         p.setStatus("Unsold");
         prepo.save(p);
-
-
     }
 
     public List<subCategory> subCategories(int cid) {
@@ -186,13 +182,11 @@ public class adminService {
             s.setImgPath(npath.substring(i + search.length()));
         }
 
-
         if (subCategories(cid).isEmpty()) {
             String new_name = c.getCname().replace(" ", "");
             String Id = new_name + 1;
             s.setSubId(Id);
         } else {
-
             Optional<subCategory> os = srepo.findLatestSubCategoryByCategoryId(cid);
             String subID = os.get().getSubId();
             int l = c.getCname().length();
@@ -204,7 +198,6 @@ public class adminService {
         s.setCategory(c);
         srepo.save(s);
     }
-
 
     public subCategory findSubCategory(String sid) {
         return srepo.findById(sid).get();
@@ -222,7 +215,6 @@ public class adminService {
             file.transferTo(new File(npath));
             srepo.updateSubCategory(sname, (String) npath.substring(i + search.length()), id);
         }
-
     }
 
     public List<Brand> getBrands(String subId) {
@@ -307,12 +299,12 @@ public class adminService {
         return urepo.findByStatus(status);
     }
 
-    public product findProductById(String id) {
+    public product findProductById(Long id) {
         return prepo.findById(id).get();
     }
 
     @Transactional
-    public void updateProduct(String pname, String price, String description, MultipartFile file, String pid) throws IllegalStateException, IOException {
+    public void updateProduct(String pname, String price, String description, MultipartFile file, Long pid) throws IllegalStateException, IOException {
 
         String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
         String npath = folderPath + file.getOriginalFilename();
@@ -326,7 +318,7 @@ public class adminService {
         }
     }
 
-    public void deleteProduct(String pid) {
+    public void deleteProduct(Long pid) {
         prepo.deleteById(pid);
     }
 
@@ -337,9 +329,7 @@ public class adminService {
         message.setText(body);
         message.setSubject(subject);
         jms.send(message);
-
     }
-
 
     @Transactional
     public void verify(String status, int id) {
@@ -379,9 +369,9 @@ public class adminService {
         return prepo.findAll();
     }
 
-	public List<subCategory> getSubCategoriesByCategoryId(Integer categoryId) {
-		return srepo.findByCategoryCid(categoryId);
-	}
+    public List<subCategory> getSubCategoriesByCategoryId(Integer categoryId) {
+        return srepo.findByCategoryCid(categoryId);
+    }
 
     public List<product> findProductsBySubCategoryIds(List<String> subCategoryIds) {
         return prepo.findByBrandSubCategorySubIdIn(subCategoryIds);
@@ -391,7 +381,6 @@ public class adminService {
         return prepo.findByBrandSubCategoryCategoryCidIn(categoryIds);
     }
 
-
     public int countProductsByCategory(int categoryId) {
         return prepo.countByBrandSubCategoryCategoryCid(categoryId);
     }
@@ -400,23 +389,115 @@ public class adminService {
         return prepo.countByBrandSubCategorySubId(subCategoryId);
     }
 
-    public category findCategoryByProductId(String pid) {
+    public category findCategoryByProductId(Long pid) {
         return prepo.findCategoryByProductId(pid);
     }
 
-    public subCategory findSubCategoryByProductId(String pid) {
+    public subCategory findSubCategoryByProductId(Long pid) {
         return prepo.findSubCategoryByProductId(pid);
     }
 
-    public List<Reviews> getReviewsByProductId(String productId) {
+    public List<Reviews> getReviewsByProductId(Long productId) {
         return rrepo.findByProductId(productId);
     }
 
-    public void addReviewToProduct(String productId, Reviews review) {
+    public void addReviewToProduct(Long productId, Reviews review) {
         product product = prepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
         review.setProduct(product);
         rrepo.save(review);
     }
 
-}
+    public Favorite getFavoriteList(int userId) {
+        return frepo.findByUserId(userId);
+    }
 
+    public void addProductToFavorites(int userId, Long productId) {
+        Favorite favoriteList = frepo.findByUserId(userId);
+        if (favoriteList == null) {
+            favoriteList = new Favorite();
+            favoriteList.setUser(urepo.findById(userId).get());
+            favoriteList.setProducts(new ArrayList<>());
+        }
+        product product = prepo.findById(productId).get();
+        favoriteList.getProducts().add(product);
+        frepo.save(favoriteList);
+    }
+
+    public void removeProductFromFavorites(int userId, Long productId) {
+        Favorite favoriteList = frepo.findByUserId(userId);
+        if (favoriteList != null) {
+            product product = prepo.findById(productId).get();
+            favoriteList.getProducts().remove(product);
+            frepo.save(favoriteList);
+        }
+    }
+
+    public subCategory findSubCategoryByBrandId(String brandId) {
+        return brepo.findSubCategoryByBrandId(brandId);
+    }
+
+    public Cart getCartList(int userId) {
+        return cartrepo.findByUserId(userId);
+    }
+
+    public void removeProductFromCart(int userId, Long productId) {
+        Cart cartList = cartrepo.findByUserId(userId);
+        if (cartList != null) {
+            product product = prepo.findById(productId).get();
+            cartList.getProducts().remove(product);
+            cartrepo.save(cartList);
+        }
+    }
+
+    @Transactional
+    public void updateProductQuantity(int userId, Long productId, String action) {
+        Cart cart = cartrepo.findByUserId(userId);
+        if (cart == null) {
+            throw new RuntimeException("Cart not found for user");
+        }
+        product product = prepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+
+        List<product> products = cart.getProducts();
+        Optional<product> optionalProduct = products.stream().filter(p -> p.getPid().equals(productId)).findFirst();
+
+        if (optionalProduct.isPresent()) {
+            product existingProduct = optionalProduct.get();
+            if (action.equals("increase")) {
+                existingProduct.setQuantity(existingProduct.getQuantity() + 1);
+            } else if (action.equals("decrease")) {
+                if (existingProduct.getQuantity() > 1) {
+                    existingProduct.setQuantity(existingProduct.getQuantity() - 1);
+                }
+            }
+            prepo.save(existingProduct);
+        } else {
+            product.setQuantity(1);
+            products.add(product);
+            prepo.save(product);
+        }
+
+        cartrepo.save(cart);
+    }
+
+
+
+
+
+    public void addProductToCart(int userId, Long productId) {
+        Cart cartList = cartrepo.findByUserId(userId);
+        if (cartList == null) {
+            cartList = new Cart();
+            cartList.setUser(urepo.findById(userId).get());
+            cartList.setProducts(new ArrayList<>());
+        }
+        product product = prepo.findById(productId).get();
+        if (cartList.getProducts().contains(product)) {
+            product.setQuantity(product.getQuantity() + 1);
+        } else {
+            product.setQuantity(1); // Установим количество по умолчанию равным 1
+            cartList.getProducts().add(product);
+        }
+        cartrepo.save(cartList);
+    }
+
+}

@@ -10,6 +10,6 @@ import com.example.demo.Entity.category;
 public interface catRepository extends JpaRepository<category, Integer> {
 	@Modifying
 	@Query("update category c set c.cname= :cname , c.imgPath= :imgPath where c.cid= :cid")
-	public void updateCategory(@Param("cname")String cname,@Param("imgPath")String imgPath,@Param("cid")int cid);
+	void updateCategory(@Param("cname")String cname,@Param("imgPath")String imgPath,@Param("cid")int cid);
 
 }

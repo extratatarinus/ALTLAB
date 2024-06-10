@@ -4,6 +4,8 @@ import java.security.Principal;
 import java.util.*;
 
 import com.example.demo.Entity.*;
+import com.example.demo.Repository.userRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,9 +20,11 @@ import jakarta.servlet.http.HttpSession;
 public class userController {
 
     private final adminService aservice;
+    private final com.example.demo.Repository.userRepository userRepository;
 
-    public userController(adminService aservice) {
+    public userController(adminService aservice, userRepository userRepository) {
         this.aservice = aservice;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/home")
@@ -29,13 +33,15 @@ public class userController {
     }
 
     @GetMapping("/subCategories/{id}")
-    public String subCategories(@PathVariable("id") String subId, Model model, HttpSession session) {
+    public String subCategories(@PathVariable("id") String subId, Model model, HttpSession session,
+                                Principal principal, @ModelAttribute("currentUrl") String currentUrl) {
         model.addAttribute("products", aservice.findProductFromSubCategory(subId));
         model.addAttribute("user", session.getAttribute("user"));
         model.addAttribute("categories", session.getAttribute("categories"));
         model.addAttribute("curSubCat", aservice.findSubCategory(subId));
         model.addAttribute("curCat", aservice.findCategoryById(aservice.findCatFromSubCat(subId)));
-        return "subCategories";
+        getProductActivity(model, principal, currentUrl);
+        return getCurrentUser(model, session, principal, "subCategories");
     }
 
     //<editor-fold desc="shop">
@@ -43,7 +49,8 @@ public class userController {
     public String shop(@RequestParam(required = false) List<Integer> categoryIds,
                        @RequestParam(required = false) List<String> subCategoryIds,
                        @RequestParam(required = false) List<String> priceRanges,
-                       Model model, HttpSession session, Principal principal) {
+                       Model model, HttpSession session, Principal principal,
+                       @ModelAttribute("currentUrl") String currentUrl) {
         List<category> categories = aservice.getCategories();
         model.addAttribute("categories", categories);
 
@@ -93,13 +100,13 @@ public class userController {
         for (String priceRange : getPriceRangeKeys()) {
             priceCounts.put(priceRange, countProductsByPriceRange(products, priceRange));
         }
-
+        getProductActivity(model, principal, currentUrl);
         model.addAttribute("priceCounts", priceCounts);
         model.addAttribute("subCategories", subCategories);
         model.addAttribute("categoryCounts", categoryCounts);
         model.addAttribute("subCategoryCounts", subCategoryCounts);
         model.addAttribute("products", filteredProducts);
-        model.addAttribute("priceRanges", priceRanges);  // Add this line
+        model.addAttribute("priceRanges", priceRanges);
         return getCurrentUser(model, session, principal, "shop");
     }
 
@@ -146,11 +153,6 @@ public class userController {
     }
     //</editor-fold>
 
-    @GetMapping("/cart")
-    public String cart(Model model, HttpSession session, Principal principal) {
-        return getCurrentUser(model, session, principal, "cart");
-    }
-
     private String getCurrentUser(Model model, HttpSession session, Principal principal, String redirect) {
         if (principal == null) {
             return "redirect:/login";
@@ -162,7 +164,12 @@ public class userController {
             model.addAttribute("user", user);
             return "login";
         } else {
+            User currentUser = aservice.findByEmail(principal.getName());
+            Favorite favoriteList = aservice.getFavoriteList(currentUser.getId());
+            Cart cartList = aservice.getCartList(currentUser.getId());
             model.addAttribute("user", user);
+            model.addAttribute("likes", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
+            model.addAttribute("corz", cartList != null ? cartList.getProducts() : new ArrayList<>());
             session.setAttribute("user", user);
             model.addAttribute("categories", aservice.getCategories());
             session.setAttribute("categories", aservice.getCategories());
@@ -170,13 +177,50 @@ public class userController {
         }
     }
 
+    @GetMapping("/checkout")
+    public String checkout(Model model, HttpSession session, Principal principal) {
+        return getCurrentUser(model, session, principal, "checkout");
+    }
+
+    @GetMapping("/contact")
+    public String contact(Model model, HttpSession session, Principal principal) {
+        return getCurrentUser(model, session, principal, "contact");
+    }
+
     @GetMapping("/favorites")
     public String favorites(Model model, HttpSession session, Principal principal) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        Favorite favoriteList = aservice.getFavoriteList(currentUser.getId());
+        model.addAttribute("favoriteList", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
         return getCurrentUser(model, session, principal, "favorites");
     }
 
+    @PostMapping("/favorites/add/{productId}")
+    public String addProductToFavorites(@PathVariable("productId") Long productId, Principal principal, @RequestParam String returnUrl) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        aservice.addProductToFavorites(currentUser.getId(), productId);
+        return "redirect:" + returnUrl;
+    }
+
+    @ModelAttribute("currentUrl")
+    public String getCurrentUrl(HttpServletRequest request) {
+        String queryString = request.getQueryString();
+        return request.getRequestURI() + (queryString != null ? "?" + queryString : "");
+    }
+
+    @PostMapping("/favorites/remove/{productId}")
+    public String removeProductFromFavorites(@PathVariable("productId") Long productId, Principal principal, @RequestParam String returnUrl) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        aservice.removeProductFromFavorites(currentUser.getId(), productId);
+        return "redirect:" + returnUrl;
+    }
+
+
     @GetMapping("/detail/{id}")
-    public String productDetails(@PathVariable("id") String pId, Model model, Principal principal, HttpSession session) {
+    public String productDetails(@PathVariable("id") Long pId, Model model,
+                                 Principal principal,
+                                 HttpSession session,
+                                 @ModelAttribute("currentUrl") String currentUrl) {
 
         model.addAttribute("products", aservice.getAllProduct());
         model.addAttribute("product", aservice.findProductById(pId));
@@ -184,12 +228,13 @@ public class userController {
         model.addAttribute("subCategory", aservice.findSubCategoryByProductId(pId));
         model.addAttribute("reviews", aservice.getReviewsByProductId(pId));
         model.addAttribute("currentUser", aservice.findByEmail(principal.getName()));
+        getProductActivity(model,principal,currentUrl);
 
         return getCurrentUser(model, session, principal, "detail");
     }
 
     @PostMapping("/detail/{id}/addReview")
-    public String addReviewToProduct(@PathVariable("id") String pId, @RequestParam String text, Principal principal) {
+    public String addReviewToProduct(@PathVariable("id") Long pId, @RequestParam String text, Principal principal) {
         User currentUser = aservice.findByEmail(principal.getName());
         Reviews review = new Reviews();
         review.setText(text);
@@ -198,5 +243,48 @@ public class userController {
         aservice.addReviewToProduct(pId, review);
         return "redirect:/USER/detail/" + pId;
     }
+
+    @GetMapping("/cart")
+    public String cart(Model model, HttpSession session, Principal principal, HttpServletRequest request) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        model.addAttribute("returnUrl", request.getRequestURI());
+        Cart cartList = aservice.getCartList(currentUser.getId());
+        model.addAttribute("cartList", cartList != null ? cartList.getProducts() : new ArrayList<>());
+        return getCurrentUser(model, session, principal, "cart");
+    }
+
+    @PostMapping("/cart/add/{productId}")
+    public String addProductToCart(@PathVariable("productId") Long productId, Principal principal, @RequestParam String returnUrl) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        aservice.addProductToCart(currentUser.getId(), productId);
+        return "redirect:" + returnUrl;
+    }
+
+    @PostMapping("/cart/remove/{productId}")
+    public String removeProductFromCart(@PathVariable("productId") Long productId, Principal principal, @RequestParam String returnUrl) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        aservice.removeProductFromCart(currentUser.getId(), productId);
+        return "redirect:" + returnUrl;
+    }
+
+    public void getProductActivity(Model model, Principal principal,@ModelAttribute("currentUrl") String currentUrl){
+        User currentUser = aservice.findByEmail(principal.getName());
+        Favorite favoriteList = aservice.getFavoriteList(currentUser.getId());
+        Cart cartList = aservice.getCartList(currentUser.getId());
+        model.addAttribute("favoriteList", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
+        model.addAttribute("cartList", cartList != null ? cartList.getProducts() : new ArrayList<>());
+        model.addAttribute("currentUrl", currentUrl);
+    }
+
+    @RequestMapping("/cart/updateQuantity/{productId}")
+    public String updateQuantity(@PathVariable Long productId,
+                                 @RequestParam String action,
+                                 Principal principal) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        aservice.updateProductQuantity(currentUser.getId(), productId, action);
+        return "redirect:/USER/cart";
+    }
+
+
 }
 
