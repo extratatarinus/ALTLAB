@@ -15,6 +15,17 @@ public class Cart {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> items;
+
+    public List<CartItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<CartItem> items) {
+        this.items = items;
+    }
+
     public List<product> getProducts() {
         return products;
     }

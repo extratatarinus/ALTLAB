@@ -24,6 +24,7 @@ public class adminService {
     private final CartRepository cartrepo;
 
    /* private final OrderRepository orepo;*/
+    private final CartItemRepository cartitemrepo;
 
     private final PromocodeRepository pcrepo;
 
@@ -52,11 +53,13 @@ public class adminService {
                         sunCatRepository srepo,
                         brandRepository brepo,
                         reviewsRepository rrepo,
-                        favoriteRepository frepo/*,
+                        favoriteRepository frepo,
+                        CartItemRepository cartitemrepo/*,
                         *//*OrderRepository orepo*/) {
         this.cartrepo = cartrepo;
         /*this.orepo = orepo;*/
         this.pcrepo = pcrepo;
+        this.cartitemrepo = cartitemrepo;
         this.jms = jms;
         this.urepo = urepo;
         this.crepo = crepo;
@@ -440,64 +443,66 @@ public class adminService {
         return cartrepo.findByUserId(userId);
     }
 
+    @Transactional
+    public void addProductToCart(int userId, Long productId) {
+        Cart cart = cartrepo.findByUserId(userId);
+        if (cart == null) {
+            cart = new Cart();
+            cart.setUser(urepo.findById(userId).orElseThrow());
+            cartrepo.save(cart);
+        }
+
+        CartItem cartItem = cartitemrepo.findByCartIdAndProduct_Pid(cart.getId(), productId);
+        if (cartItem == null) {
+            cartItem = new CartItem();
+            cartItem.setCart(cart);
+            cartItem.setProduct(prepo.findById(productId).orElseThrow());
+            cartItem.setQuantity(1);
+        } else {
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+        }
+        cartItem.updatePrice();
+        cartitemrepo.save(cartItem);
+    }
+
+    @Transactional
     public void removeProductFromCart(int userId, Long productId) {
-        Cart cartList = cartrepo.findByUserId(userId);
-        if (cartList != null) {
-            product product = prepo.findById(productId).get();
-            cartList.getProducts().remove(product);
-            cartrepo.save(cartList);
+        Cart cart = cartrepo.findByUserId(userId);
+        if (cart != null) {
+            CartItem cartItem = cartitemrepo.findByCartIdAndProduct_Pid(cart.getId(), productId);
+            if (cartItem != null) {
+                cartitemrepo.delete(cartItem);
+            }
         }
     }
 
     @Transactional
-    public void updateProductQuantity(int userId, Long productId, String action) {
+    public void increaseQuantity(int userId, Long productId) {
         Cart cart = cartrepo.findByUserId(userId);
-        if (cart == null) {
-            throw new RuntimeException("Cart not found for user");
-        }
-        product product = prepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
-
-        List<product> products = cart.getProducts();
-        Optional<product> optionalProduct = products.stream().filter(p -> p.getPid().equals(productId)).findFirst();
-
-        if (optionalProduct.isPresent()) {
-            product existingProduct = optionalProduct.get();
-            if (action.equals("increase")) {
-                existingProduct.setQuantity(existingProduct.getQuantity() + 1);
-            } else if (action.equals("decrease")) {
-                if (existingProduct.getQuantity() > 1) {
-                    existingProduct.setQuantity(existingProduct.getQuantity() - 1);
-                }
+        if (cart != null) {
+            CartItem cartItem = cartitemrepo.findByCartIdAndProduct_Pid(cart.getId(), productId);
+            if (cartItem != null) {
+                cartItem.setQuantity(cartItem.getQuantity() + 1);
+                cartItem.updatePrice();
+                cartitemrepo.save(cartItem);
             }
-            prepo.save(existingProduct);
-        } else {
-            product.setQuantity(1);
-            products.add(product);
-            prepo.save(product);
         }
-
-        cartrepo.save(cart);
     }
 
-
-
-
-
-    public void addProductToCart(int userId, Long productId) {
-        Cart cartList = cartrepo.findByUserId(userId);
-        if (cartList == null) {
-            cartList = new Cart();
-            cartList.setUser(urepo.findById(userId).get());
-            cartList.setProducts(new ArrayList<>());
+    @Transactional
+    public void decreaseQuantity(int userId, Long productId) {
+        Cart cart = cartrepo.findByUserId(userId);
+        if (cart != null) {
+            CartItem cartItem = cartitemrepo.findByCartIdAndProduct_Pid(cart.getId(), productId);
+            if (cartItem != null && cartItem.getQuantity() > 1) {
+                cartItem.setQuantity(cartItem.getQuantity() - 1);
+                cartItem.updatePrice();
+                cartitemrepo.save(cartItem);
+            }
         }
-        product product = prepo.findById(productId).get();
-        if (cartList.getProducts().contains(product)) {
-            product.setQuantity(product.getQuantity() + 1);
-        } else {
-            product.setQuantity(1); // Установим количество по умолчанию равным 1
-            cartList.getProducts().add(product);
-        }
-        cartrepo.save(cartList);
     }
 
+    public PromoCode getPromoCodeByCode(String code) {
+        return pcrepo.findByCode(code);
+    }
 }

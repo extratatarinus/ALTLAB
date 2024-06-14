@@ -14,21 +14,21 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.service.adminService;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/USER")
 public class userController {
 
     private final adminService aservice;
-    private final com.example.demo.Repository.userRepository userRepository;
 
-    public userController(adminService aservice, userRepository userRepository) {
+    public userController(adminService aservice) {
         this.aservice = aservice;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/home")
     public String home(Model model, HttpSession session, Principal principal) {
+
         return getCurrentUser(model, session, principal, "user_home");
     }
 
@@ -169,17 +169,12 @@ public class userController {
             Cart cartList = aservice.getCartList(currentUser.getId());
             model.addAttribute("user", user);
             model.addAttribute("likes", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
-            model.addAttribute("corz", cartList != null ? cartList.getProducts() : new ArrayList<>());
+            model.addAttribute("corz", cartList != null ? cartList.getItems() : new ArrayList<>());
             session.setAttribute("user", user);
             model.addAttribute("categories", aservice.getCategories());
             session.setAttribute("categories", aservice.getCategories());
             return redirect;
         }
-    }
-
-    @GetMapping("/checkout")
-    public String checkout(Model model, HttpSession session, Principal principal) {
-        return getCurrentUser(model, session, principal, "checkout");
     }
 
     @GetMapping("/contact")
@@ -245,11 +240,36 @@ public class userController {
     }
 
     @GetMapping("/cart")
-    public String cart(Model model, HttpSession session, Principal principal, HttpServletRequest request) {
+    public String cart(Model model,
+                       HttpSession session,
+                       Principal principal,
+                       @ModelAttribute("currentUrl") String currentUrl,
+                       @RequestParam(required = false) String promoCode) {
         User currentUser = aservice.findByEmail(principal.getName());
-        model.addAttribute("returnUrl", request.getRequestURI());
         Cart cartList = aservice.getCartList(currentUser.getId());
-        model.addAttribute("cartList", cartList != null ? cartList.getProducts() : new ArrayList<>());
+        Cart cart = aservice.getCartList(currentUser.getId());
+        int totalSum = cart.getItems().stream().mapToInt(CartItem::getPrice).sum();
+        int shippingCost = totalSum > 1000 ? 0 : 100;
+
+        double discountPercentage = 0;
+
+        if (promoCode != null && !promoCode.isEmpty()) {
+            PromoCode code = aservice.getPromoCodeByCode(promoCode);
+            if (code != null) {
+                discountPercentage = code.getDiscountPercentage();
+            }
+        }
+
+        double discountAmount = totalSum * discountPercentage / 100;
+        double finalTotal = totalSum - discountAmount + shippingCost;
+
+        model.addAttribute("cartList", cartList != null ? cartList : new Cart());
+        model.addAttribute("user", currentUser);
+        model.addAttribute("totalSum", totalSum);
+        model.addAttribute("shippingCost", shippingCost);
+        model.addAttribute("discountPercentage", discountPercentage);
+        model.addAttribute("discountAmount", discountAmount);
+        model.addAttribute("finalTotal", finalTotal);
         return getCurrentUser(model, session, principal, "cart");
     }
 
@@ -267,24 +287,76 @@ public class userController {
         return "redirect:" + returnUrl;
     }
 
+    @PostMapping("/cart/update/increase/{userId}/{productId}")
+    public String increaseCart(@PathVariable int userId, @PathVariable Long productId) {
+        System.out.println("Action: increase");
+        System.out.println("Product ID: " + productId);
+        System.out.println("User ID: " + userId);
+
+        aservice.increaseQuantity(userId, productId);
+        return "redirect:/USER/cart";
+    }
+
+    @PostMapping("/cart/update/decrease/{userId}/{productId}")
+    public String decreaseCart(@PathVariable int userId, @PathVariable Long productId) {
+        System.out.println("Action: decrease");
+        System.out.println("Product ID: " + productId);
+        System.out.println("User ID: " + userId);
+
+        aservice.decreaseQuantity(userId, productId);
+        return "redirect:/USER/cart";
+    }
+
+    @PostMapping("/USER/cart/applyPromoCode")
+    public String applyPromoCode(@RequestParam("promoCode") String promoCode, HttpSession session, RedirectAttributes redirectAttributes) {
+        session.setAttribute("promoCode", promoCode);
+        return "redirect:/USER/cart";
+    }
+
+    @GetMapping("/checkout")
+    public String checkout(Model model,
+                           HttpSession session,
+                           Principal principal) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        Cart cartList = aservice.getCartList(currentUser.getId());
+        int totalSum = cartList.getItems().stream().mapToInt(CartItem::getPrice).sum();
+        int shippingCost = totalSum > 1000 ? 0 : 100;
+
+        double discountPercentage = 0;
+        String promoCode = (String) session.getAttribute("promoCode");
+
+        if (promoCode != null && !promoCode.isEmpty()) {
+            PromoCode code = aservice.getPromoCodeByCode(promoCode);
+            if (code != null) {
+                discountPercentage = code.getDiscountPercentage();
+            }
+        }
+
+        double discountAmount = totalSum * discountPercentage / 100;
+        double finalTotal = totalSum - discountAmount + shippingCost;
+
+        model.addAttribute("cartList", cartList != null ? cartList : new Cart());
+        model.addAttribute("user", currentUser);
+        model.addAttribute("totalSum", totalSum);
+        model.addAttribute("shippingCost", shippingCost);
+        model.addAttribute("discountPercentage", discountPercentage);
+        model.addAttribute("discountAmount", discountAmount);
+        model.addAttribute("finalTotal", finalTotal);
+        model.addAttribute("promoCode", promoCode);
+
+        return getCurrentUser(model, session, principal, "checkout");
+    }
+
+
+
     public void getProductActivity(Model model, Principal principal,@ModelAttribute("currentUrl") String currentUrl){
         User currentUser = aservice.findByEmail(principal.getName());
         Favorite favoriteList = aservice.getFavoriteList(currentUser.getId());
         Cart cartList = aservice.getCartList(currentUser.getId());
         model.addAttribute("favoriteList", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
-        model.addAttribute("cartList", cartList != null ? cartList.getProducts() : new ArrayList<>());
+        model.addAttribute("cartList", cartList != null ? cartList.getItems() : new ArrayList<>());
         model.addAttribute("currentUrl", currentUrl);
     }
-
-    @RequestMapping("/cart/updateQuantity/{productId}")
-    public String updateQuantity(@PathVariable Long productId,
-                                 @RequestParam String action,
-                                 Principal principal) {
-        User currentUser = aservice.findByEmail(principal.getName());
-        aservice.updateProductQuantity(currentUser.getId(), productId, action);
-        return "redirect:/USER/cart";
-    }
-
 
 }
 

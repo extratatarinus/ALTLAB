@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" th:replace="~{user_base::layout(~{::section})}">
-
 <head>
-    <title>Корзина</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-
 <body>
 <section>
-    <!-- Breadcrumb Start -->
     <div class="container-fluid">
         <div class="row px-xl-5">
             <div class="col-12">
@@ -21,10 +15,7 @@
             </div>
         </div>
     </div>
-    <!-- Breadcrumb End -->
 
-
-    <!-- Cart Start -->
     <div class="container-fluid">
         <div class="row px-xl-5">
             <div class="col-lg-8 table-responsive mb-5">
@@ -39,112 +30,78 @@
                         <th>Удалить</th>
                     </tr>
                     </thead>
-                    <tbody class="align-middle" th:each="product : ${cartList}">
-                    <tr data-product-id="[[${product.pid}]]">
-                        <td class="align-middle"><img th:src="@{'/image/' + ${product.imgPath}}" alt="" style="width: 50px;"></td>
-                        <td class="align-middle"><a th:text="'  '+${product.pname}"></a></td>
-                        <td class="align-middle product-price" th:text="${product.price} + '₽'"></td>
+                    <tbody class="align-middle" th:if="${cartList != null}" th:each="item : ${cartList.items}">
+                    <tr>
+                        <td class="align-middle"><img th:src="@{'/image/' + ${item.product.imgPath}}" alt="" style="width: 50px;"></td>
+                        <td class="align-middle"><a th:text="'  '+${item.product.pname}"></a></td>
+                        <td class="align-middle" th:text="${item.product.price} + '₽'"></td>
                         <td class="align-middle">
                             <div class="input-group quantity mx-auto" style="width: 100px;">
                                 <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-primary btn-minus" data-action="decrease">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
+                                    <form method="post" th:action="@{/USER/cart/update/decrease/{userId}/{productId}(userId=${user.id}, productId=${item.product.pid})}">
+                                        <button type="submit" class="btn btn-sm btn-primary btn-minus" th:disabled="${item.quantity == 1}">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </form>
                                 </div>
-                                <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center product-quantity" th:value="${product.quantity}" readonly>
+                                <input type="text" class="form-control form-control-sm bg-secondary text-center" th:value="${item.quantity}">
                                 <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-primary btn-plus" data-action="increase">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
+                                    <form method="post" th:action="@{/USER/cart/update/increase/{userId}/{productId}(userId=${user.id}, productId=${item.product.pid})}">
+                                        <button type="submit" class="btn btn-sm btn-primary btn-plus">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </td>
-                        <td class="align-middle product-total" th:text="${product.price * product.quantity} + '₽'"></td>
+                        <td class="align-middle" th:text="${item.price} + '₽'"></td>
                         <td class="align-middle">
-                            <form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post">
-                                <input type="hidden" name="returnUrl" th:value="${currentUrl}">
-                                <button class="btn btn-sm btn-danger">
-                                    <i class="fa fa-times"></i>
-                                </button>
+                            <form method="post" th:action="@{/USER/cart/remove/{productId}(productId=${item.product.pid})}">
+                                <input type="hidden" name="returnUrl" th:value="@{/USER/cart}">
+                                <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button>
                             </form>
                         </td>
                     </tr>
                     </tbody>
                 </table>
+                </table>
             </div>
             <div class="col-lg-4">
-                <form class="mb-30" action="">
-                    <div class="input-group">
-                        <input type="text" class="form-control border-0 p-4" placeholder="Купон">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary">Ввести купон</button>
-                        </div>
-                    </div>
+                <form class="mb-30" th:action="@{/USER/cart/applyPromoCode}" method="post">
+                    <input type="text" name="promoCode" placeholder="Введите Промокод" />
+                    <button type="submit" class="btn btn-primary">Подтвердить</button>
                 </form>
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Сумма</span></h5>
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Сумма заказа</span></h5>
                 <div class="bg-light p-30 mb-5">
                     <div class="border-bottom pb-2">
                         <div class="d-flex justify-content-between mb-3">
-                            <h6>Сумма товаров</h6>
-                            <h6 class="total-price" th:text="${totalPrice} + '₽'"></h6>
+                            <h6>Стоимость товаров</h6>
+                            <h6 th:text="${totalSum} + '₽'"></h6>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6 class="font-weight-medium">Доставка</h6>
+                            <h6 class="font-weight-medium" th:text="${shippingCost} + '₽'"></h6>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <h6 class="font-weight-medium">Доставка</h6>
-                            <h6 class="font-weight-medium">Бесплатно</h6>
+                            <h6 class="font-weight-medium" th:if="${discountPercentage > 0}">Скидка @ <span th:text="${discountPercentage} + '%'"></span></h6>
+                            <h6 class="font-weight-medium" th:if="${discountPercentage > 0}" th:text="'-' + ${discountAmount} + '₽'"></h6>
                         </div>
                     </div>
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Всего</h5>
-                            <h5 class="total-price" th:text="${totalPrice} + '₽'"></h5>
+                            <h5 th:text="${finalTotal} + '₽'"></h5>
                         </div>
-                        <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Купить товар</button>
+                        <form th:action="@{/USER/checkout}" method="get">
+                            <input type="hidden" name="promoCode" th:value="${promoCode}" />
+                            <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Заказать</button>
+                        </form>
                     </div>
+                    <small class="text-center">При покупке от 1000 рублей доставка бесплатная</small>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Cart End -->
 </section>
-
-<script>
-    $(document).ready(function() {
-        $('.btn-minus, .btn-plus').click(function() {
-            var $this = $(this);
-            var action = $this.data('action');
-            var $row = $this.closest('tr');
-            var productId = $row.data('product-id');
-
-            $.ajax({
-                url: '/USER/cart/updateQuantity/' + productId,
-                type: 'POST',
-                data: { action: action },
-                success: function(response) {
-                    var newQuantity = parseInt($row.find('.product-quantity').val());
-                    if (action === 'increase') {
-                        newQuantity++;
-                    } else if (action === 'decrease' && newQuantity > 1) {
-                        newQuantity--;
-                    }
-                    $row.find('.product-quantity').val(newQuantity);
-                    var pricePerItem = parseFloat($row.find('.product-price').text().replace('₽', ''));
-                    var newTotal = newQuantity * pricePerItem;
-                    $row.find('.product-total').text(newTotal + '₽');
-
-                    // Обновляем общую сумму
-                    var totalPrice = 0;
-                    $('.product-total').each(function() {
-                        totalPrice += parseFloat($(this).text().replace('₽', ''));
-                    });
-                    $('.total-price').text(totalPrice + '₽');
-                },
-                error: function(xhr, status, error) {
-                    console.error('Failed to update quantity:', error);
-                }
-            });
-        });
-    });
-</script>
-
 </body>
 </html>
