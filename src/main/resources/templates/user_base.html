@@ -45,13 +45,13 @@
 				</a>
 			</div>
 			<div class="col-lg-4 col-6 text-left">
-				<form action="">
+				<form action="#" method="get" onsubmit="window.location.href='/USER/search/' + encodeURIComponent(this.keyword.value); return false;">
 					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Найти товар">
+						<input type="text" name="keyword" class="form-control" placeholder="Найти товар">
 						<div class="input-group-append">
-							<span class="input-group-text bg-transparent text-primary">
+							<button type="submit" class="input-group-text bg-transparent text-primary">
 								<i class="fa fa-search"></i>
-							</span>
+							</button>
 						</div>
 					</div>
 				</form>
@@ -78,7 +78,7 @@
 					id="navbar-vertical" style="width: calc(100% - 30px); z-index: 999;">
 					<div class="navbar-nav w-100">
 						<div class="nav-item dropdown dropright" th:each="category : ${categories}">
-							<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
+							<a th:href="@{'/USER/category/'+ ${category.cid}}" class="nav-link dropdown-toggle" data-toggle="dropdown"
 								th:text="${category.cname}">
 								<i class="fa fa-angle-right float-right mt-1"></i>
 							</a>
@@ -157,21 +157,19 @@
 					<div class="col-md-4 mb-5">
 						<h5 class="text-secondary text-uppercase mb-4">Быстрая покупка</h5>
 						<div class="d-flex flex-column justify-content-start">
-							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Главная</a>
+							<a class="text-secondary mb-2" th:href="@{/USER/home}"><i class="fa fa-angle-right mr-2"></i>Главная</a>
 							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>О нас</a>
-							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Магазин</a>
-							<a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Напишите нам</a>
+							<a class="text-secondary mb-2" th:href="@{/USER/shop}"><i class="fa fa-angle-right mr-2"></i>Магазин</a>
+							<a class="text-secondary" th:href="@{/USER/contact}"><i class="fa fa-angle-right mr-2"></i>Напишите нам</a>
 						</div>
 					</div>
 					<div class="col-md-4 mb-5">
 						<h5 class="text-secondary text-uppercase mb-4">Мой аккаунт</h5>
 						<div class="d-flex flex-column justify-content-start">
-							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Главная</a>
-							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Корзина</a>
-							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Избранное</a>
-							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Корзина</a>
+							<a class="text-secondary mb-2" th:href="@{/USER/home}"><i class="fa fa-angle-right mr-2"></i>Главная</a>
+							<a class="text-secondary mb-2" th:href="@{/USER/cart}"><i class="fa fa-angle-right mr-2"></i>Корзина</a>
+							<a class="text-secondary mb-2" th:href="@{/USER/favorites}"><i class="fa fa-angle-right mr-2"></i>Избранное</a>
 							<a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Заказы</a>
-							<a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Напишите нам</a>
 						</div>
 					</div>
 					<div class="col-md-4 mb-5">

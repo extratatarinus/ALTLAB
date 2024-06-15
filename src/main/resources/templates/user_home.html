@@ -8,15 +8,6 @@
 <body>
 	<section>
 
-		<!--<script th:inline="javascript">
-		var condition="${user.status=='Unverified'}"
-		var name="${user.name}"
-		if(condition){
-			alert("Dear"+name+" , You are not verified till now please wait until you get verification email!");
-		}
-	</script-->
-
-
 		<div class="container-fluid pt-5">
 					<div id="header-carousel" class="carousel slide carousel-fade mb-30 mb-lg-0" data-ride="carousel">
 						<ol class="carousel-indicators">
@@ -26,50 +17,47 @@
 						</ol>
 						<div class="carousel-inner">
 							<div class="carousel-item position-relative active" style="height: 430px;">
-								<img class="position-absolute w-100 h-100" th:src="@{/image/electronics.jpg}"
+								<img class="position-absolute w-100 h-100" th:src="@{/img/plenka.jpg}"
 									style="object-fit: cover;">
 								<div
 									class="carousel-caption d-flex flex-column align-items-center justify-content-center">
 									<div class="p-3" style="max-width: 700px;">
 										<h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">
-											Electronics</h1>
-										<p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna
-											amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum
-											diam</p>
+											Плёнки</h1>
+										<p class="mx-md-5 px-5 animate__animated animate__bounceIn">Набор с защитной плёнкой, а также с обезжиривающим
+											спреем и спиртовой салфеткой</p>
 										<a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp"
-											href="#">Shop Now</a>
+										   th:href="@{'/USER/category/2'}">Купить сейчас</a>
 									</div>
 								</div>
 							</div>
 							<div class="carousel-item position-relative" style="height: 430px;">
-								<img class="position-absolute w-100 h-100" th:src="@{/img/menFashion.jpg}"
+								<img class="position-absolute w-100 h-100" th:src="@{/img/nakleika.jpg}"
 									style="object-fit: cover;">
 								<div
 									class="carousel-caption d-flex flex-column align-items-center justify-content-center">
 									<div class="p-3" style="max-width: 700px;">
 										<h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">
-											Men Fashion</h1>
-										<p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna
-											amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum
-											diam</p>
+											Наклейки</h1>
+										<p class="mx-md-5 px-5 animate__animated animate__bounceIn">Глянцевые наклейки из качественной бумаги,
+											с вашим любимым рисунком</p>
 										<a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp"
-											href="#">Shop Now</a>
+										   th:href="@{'/USER/category/1'}">Купить сейчас</a>
 									</div>
 								</div>
 							</div>
 							<div class="carousel-item position-relative" style="height: 430px;">
 								<img class="position-absolute w-100 h-100" style="object-fit: cover;"
-									th:src="@{/img/groceries.jpg}">
+									th:src="@{/img/znacki.jpg}">
 								<div
 									class="carousel-caption d-flex flex-column align-items-center justify-content-center">
 									<div class="p-3" style="max-width: 700px;">
 										<h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">
-											Groceries</h1>
-										<p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna
-											amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum
-											diam</p>
+											Значки</h1>
+										<p class="mx-md-5 px-5 animate__animated animate__bounceIn">Значки из ламинированной, качественной бумаги, а также
+										заготовки для значков</p>
 										<a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp"
-											href="#">Shop Now</a>
+										   th:href="@{'/USER/category/3'}">Купить сейчас</a>
 									</div>
 								</div>
 							</div>
@@ -119,7 +107,7 @@
 					class="bg-secondary pr-3">Категории</span></h2>
 			<div class="row px-xl-5 pb-3">
 				<div class="col-lg-3 col-md-4 col-sm-6 pb-1" th:each="e:${categories}">
-					<a class="text-decoration-none" href="">
+					<a class="text-decoration-none" th:href="@{'/USER/category/'+ ${e.cid}}">
 						<div class="cat-item d-flex align-items-center mb-4">
 							<div class="overflow-hidden" style="width: 100px; display: flex; height: 100px; justify-content: center; align-items: center;">
 								<img class="img-fluid" th:src="@{'/image/'+${e.imgPath}}" alt="" style="height: 80px;" >
@@ -141,35 +129,45 @@
 			<h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span
 					class="bg-secondary pr-3">Популярные товары</span></h2>
 			<div class="row px-xl-5">
-				<div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+				<!-- Product -->
+				<div class="col-lg-3 col-md-4 col-sm-6 pb-1" th:each="product : ${topProducts}">
 					<div class="product-item bg-light mb-4">
 						<div class="product-img position-relative overflow-hidden">
-							<img class="img-fluid w-100" src="img/product-1.jpg" alt="">
+							<img class="img-fluid w-100" th:src="@{'/image/' + ${product.imgPath}}" alt="">
 							<div class="product-action">
-								<a class="btn btn-outline-dark btn-square" href=""><i
-										class="fa fa-shopping-cart"></i></a>
-								<a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-								<a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-								<a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
+								<a class="btn btn-outline-dark btn-square" href="">
+									<form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.containsProduct(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square"><i class="fa fa-shopping-cart"></i></button>
+									</form>
+									<form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.containsProduct(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="fa fa-shopping-cart"></i></button>
+									</form>
+								</a>
+								<a class="btn btn-outline-dark btn-square" href="">
+									<form th:action="@{/USER/favorites/add/{productId}(productId=${product.pid})}" method="post" th:if="${favoriteList == null or !favoriteList.contains(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square"><i class="far fa-heart"></i></button>
+									</form>
+									<form th:action="@{/USER/favorites/remove/{productId}(productId=${product.pid})}" method="post" th:if="${favoriteList != null and favoriteList.contains(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="far fa-heart"></i></button>
+									</form>
+								</a>
+								<a class="btn btn-outline-dark btn-square" th:href="@{'/USER/detail/'+ ${product.pid}}"><i class="fa fa-search"></i></a>
 							</div>
 						</div>
 						<div class="text-center py-4">
-							<a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
+							<a class="h6 text-decoration-none text-center" th:text="${product.pname}" href=""></a>
 							<div class="d-flex align-items-center justify-content-center mt-2">
-								<h5>$123.00</h5>
-								<h6 class="text-muted ml-2"><del>$123.00</del></h6>
-							</div>
-							<div class="d-flex align-items-center justify-content-center mb-1">
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small>(99)</small>
+								<h5><span th:text="'Цена: ' + ${product.price} + '₽'"></span></h5>
+								<h6 class="text-muted ml-2"><del></del></h6>
 							</div>
 						</div>
 					</div>
 				</div>
+				<!-- Product end -->
 			</div>
 		</div>
 		<!-- Products End -->
@@ -180,35 +178,45 @@
 			<h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span
 					class="bg-secondary pr-3">Новинки</span></h2>
 			<div class="row px-xl-5">
-				<div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+				<!-- Product -->
+				<div class="col-lg-3 col-md-4 col-sm-6 pb-1" th:each="product : ${newProducts}">
 					<div class="product-item bg-light mb-4">
 						<div class="product-img position-relative overflow-hidden">
-							<img class="img-fluid w-100" src="img/product-1.jpg" alt="">
+							<img class="img-fluid w-100" th:src="@{'/image/' + ${product.imgPath}}" alt="">
 							<div class="product-action">
-								<a class="btn btn-outline-dark btn-square" href=""><i
-										class="fa fa-shopping-cart"></i></a>
-								<a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-								<a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-								<a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
+								<a class="btn btn-outline-dark btn-square" href="">
+									<form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.containsProduct(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square"><i class="fa fa-shopping-cart"></i></button>
+									</form>
+									<form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.containsProduct(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="fa fa-shopping-cart"></i></button>
+									</form>
+								</a>
+								<a class="btn btn-outline-dark btn-square" href="">
+									<form th:action="@{/USER/favorites/add/{productId}(productId=${product.pid})}" method="post" th:if="${favoriteList == null or !favoriteList.contains(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square"><i class="far fa-heart"></i></button>
+									</form>
+									<form th:action="@{/USER/favorites/remove/{productId}(productId=${product.pid})}" method="post" th:if="${favoriteList != null and favoriteList.contains(product)}">
+										<input type="hidden" name="returnUrl" th:value="${currentUrl}">
+										<button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="far fa-heart"></i></button>
+									</form>
+								</a>
+								<a class="btn btn-outline-dark btn-square" th:href="@{'/USER/detail/'+ ${product.pid}}"><i class="fa fa-search"></i></a>
 							</div>
 						</div>
 						<div class="text-center py-4">
-							<a class="h6 text-decoration-none text-truncate" href="">Product Name Goes Here</a>
+							<a class="h6 text-decoration-none text-center" th:text="${product.pname}" href=""></a>
 							<div class="d-flex align-items-center justify-content-center mt-2">
-								<h5>$123.00</h5>
-								<h6 class="text-muted ml-2"><del>$123.00</del></h6>
-							</div>
-							<div class="d-flex align-items-center justify-content-center mb-1">
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small class="fa fa-star text-primary mr-1"></small>
-								<small>(99)</small>
+								<h5><span th:text="'Цена: ' + ${product.price} + '₽'"></span></h5>
+								<h6 class="text-muted ml-2"><del></del></h6>
 							</div>
 						</div>
 					</div>
 				</div>
+				<!-- Product end -->
 			</div>
 		</div>
 		<!-- Products End -->

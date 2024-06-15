@@ -127,11 +127,11 @@
                                 <img class="img-fluid w-100" th:src="@{'/image/' + ${product.imgPath}}" alt="">
                                 <div class="product-action">
                                     <a class="btn btn-outline-dark btn-square" href="">
-                                        <form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.contains(items)}">
+                                        <form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.containsProduct(product)}">
                                             <input type="hidden" name="returnUrl" th:value="${currentUrl}">
                                             <button type="submit" class="btn btn-outline-dark btn-square"><i class="fa fa-shopping-cart"></i></button>
                                         </form>
-                                        <form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.contains(items)}">
+                                        <form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.containsProduct(product)}">
                                             <input type="hidden" name="returnUrl" th:value="${currentUrl}">
                                             <button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="fa fa-shopping-cart"></i></button>
                                         </form>

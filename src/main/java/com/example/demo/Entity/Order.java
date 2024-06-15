@@ -1,51 +1,50 @@
-/*
 package com.example.demo.Entity;
 
-import java.time.LocalDateTime;
-
-
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Entity
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems;
+    private List<OrderItem> items;
 
-    private double totalAmount;
-
-    private double discount;
-
-    private String promoCode;
-
+    private String firstName;
+    private String lastName;
+    private String phone;
+    private String address;
+    private String city;
+    private String region;
+    private String zipCode;
+    private String paymentMethod;
+    private String status;
     private LocalDateTime orderDate;
+
+    private int totalSum;
+    private int shippingCost;
+    private double discountPercentage;
+    private double discountAmount;
+    private double finalTotal;
 
     public Order() {
     }
 
-    public Order(User user, List<OrderItem> orderItems, double totalAmount, double discount, String promoCode, LocalDateTime orderDate) {
-        this.user = user;
-        this.orderItems = orderItems;
-        this.totalAmount = totalAmount;
-        this.discount = discount;
-        this.promoCode = promoCode;
-        this.orderDate = orderDate;
+    public Long getId() {
+        return id;
     }
 
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public User getUser() {
@@ -56,36 +55,84 @@ public class Order {
         this.user = user;
     }
 
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
     }
 
-    public double getTotalAmount() {
-        return totalAmount;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public double getDiscount() {
-        return discount;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setDiscount(double discount) {
-        this.discount = discount;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public String getPromoCode() {
-        return promoCode;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPromoCode(String promoCode) {
-        this.promoCode = promoCode;
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDateTime getOrderDate() {
@@ -96,6 +143,49 @@ public class Order {
         this.orderDate = orderDate;
     }
 
-    // Getters and Setters
+    public int getTotalSum() {
+        return totalSum;
+    }
+
+    public void setTotalSum(int totalSum) {
+        this.totalSum = totalSum;
+    }
+
+    public int getShippingCost() {
+        return shippingCost;
+    }
+
+    public void setShippingCost(int shippingCost) {
+        this.shippingCost = shippingCost;
+    }
+
+    public double getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(double discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
+
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public double getFinalTotal() {
+        return finalTotal;
+    }
+
+    public void setFinalTotal(double finalTotal) {
+        this.finalTotal = finalTotal;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        orderDate = LocalDateTime.now();
+    }
+
 }
-*/

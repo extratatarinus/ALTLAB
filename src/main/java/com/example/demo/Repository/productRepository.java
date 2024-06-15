@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.example.demo.Entity.category;
 import com.example.demo.Entity.subCategory;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,15 +15,8 @@ import com.example.demo.Entity.product;
 
 public interface productRepository extends JpaRepository<product, Long> {
 
-    product findByPname(String pname);
-
-    product findTopByPnameOrderByAddDateDesc(String name);
-
     @Query("select s from product s where s.brand.bid= :bid")
     List<product> findProductByBId(@Param("bid") String bid);
-
-    @Query("select p from product p where p.brand.bid= :bid order by p.addDate DESC LIMIT 1")
-    product findProductByBIdOrderByCreatedAt(@Param("bid") String bid);
 
     @Modifying
     @Query("update product p set p.pname= :pname, p.price= :price , p.description= :description,p.imgPath= :imgPath where p.pid= :pid")
@@ -49,4 +44,15 @@ public interface productRepository extends JpaRepository<product, Long> {
     @Query("SELECT p.brand.subCategory FROM product p WHERE p.pid = :pid")
     subCategory findSubCategoryByProductId(@Param("pid") Long pid);
 
+    @Query("SELECT p FROM product p WHERE p.pname LIKE %:keyword%")
+    List<product> findByPnameContaining(@Param("keyword") String keyword);
+
+    @Query("SELECT p FROM product p ORDER BY p.addDate DESC")
+    List<product> findTop8ByOrderByAddDateDesc(Pageable pageable);
+
+    @Query("SELECT p FROM product p LEFT JOIN p.reviews r GROUP BY p ORDER BY COUNT(r) DESC")
+    List<product> findTop8ByOrderByReviewsCountDesc(Pageable pageable);
+
+    @Query("SELECT p FROM product p WHERE p.brand.subCategory.category.cid = :categoryId")
+    List<product> findProductsByCategoryId(@Param("categoryId") String categoryId);
 }

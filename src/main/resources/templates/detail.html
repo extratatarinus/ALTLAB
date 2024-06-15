@@ -37,13 +37,6 @@
                 <div class="h-100 bg-light p-30">
                     <h3 th:text="${product.pname}">Product Name Goes Here</h3>
                     <div class="d-flex mb-3">
-                        <div class="text-primary mr-2">
-                            <small class="fas fa-star"></small>
-                            <small class="fas fa-star"></small>
-                            <small class="fas fa-star"></small>
-                            <small class="fas fa-star-half-alt"></small>
-                            <small class="far fa-star"></small>
-                        </div>
                         <small class="pt-1" th:text="'(' + ${reviews.size()} +') Отзывов(ва)' ">(99 Reviews)</small>
                     </div>
                     <h3 class="font-weight-semi-bold mb-4" th:text="${product.price} + '₽'">$150.00</h3>
@@ -117,13 +110,6 @@
                                         <img th:src="@{'/image/' + ${review.author.imgPath}}" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
                                         <div class="media-body">
                                             <h6 th:text="${review.author.name}"><small> - <i th:text="${#dates.format(review.createdAt, 'dd MMM yyyy')}">01 Jan 2045</i></small></h6>
-                                            <div class="text-primary mb-2">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star-half-alt"></i>
-                                                <i class="far fa-star"></i>
-                                            </div>
                                             <p th:text="${review.text}">Текст отзыва</p>
                                         </div>
                                     </div>
@@ -133,13 +119,6 @@
                                     <small>Ваш email не будет опубликован.</small>
                                     <div class="d-flex my-3">
                                         <p class="mb-0 mr-2">Ваша оценка:</p>
-                                        <div class="text-primary">
-                                            <i class="far fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                        </div>
                                     </div>
                                     <form th:action="@{'/USER/detail/' + ${product.pid} + '/addReview'}" method="post">
                                         <div class="form-group">
@@ -180,11 +159,11 @@
                                 <img class="img-fluid w-100" th:src="@{'/image/' + ${product.imgPath}}" alt="">
                                 <div class="product-action">
                                     <a class="btn btn-outline-dark btn-square" href="">
-                                        <form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.contains(product)}">
+                                        <form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.containsProduct(product)}">
                                             <input type="hidden" name="returnUrl" th:value="${currentUrl}">
                                             <button type="submit" class="btn btn-outline-dark btn-square"><i class="fa fa-shopping-cart"></i></button>
                                         </form>
-                                        <form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.contains(product)}">
+                                        <form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.containsProduct(product)}">
                                             <input type="hidden" name="returnUrl" th:value="${currentUrl}">
                                             <button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="fa fa-shopping-cart"></i></button>
                                         </form>

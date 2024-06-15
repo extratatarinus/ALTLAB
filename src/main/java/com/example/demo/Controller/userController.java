@@ -1,12 +1,13 @@
 package com.example.demo.Controller;
 
 import java.security.Principal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import com.example.demo.Entity.*;
-import com.example.demo.Repository.userRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,13 @@ public class userController {
     }
 
     @GetMapping("/home")
-    public String home(Model model, HttpSession session, Principal principal) {
-
+    public String home(Model model, HttpSession session, Principal principal, @ModelAttribute("currentUrl") String currentUrl) {
+        Pageable pageable = PageRequest.of(0, 8);
+        List<product> newProducts = aservice.findTop8ByOrderByAddDateDesc(pageable);
+        List<product> topProducts = aservice.findTop8ByOrderByReviewsCountDesc(pageable);
+        model.addAttribute("topProducts", topProducts);
+        model.addAttribute("newProducts", newProducts);
+        getProductActivity(model,principal,currentUrl);
         return getCurrentUser(model, session, principal, "user_home");
     }
 
@@ -153,29 +159,6 @@ public class userController {
     }
     //</editor-fold>
 
-    private String getCurrentUser(Model model, HttpSession session, Principal principal, String redirect) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
-
-        User user = aservice.findByEmail(principal.getName());
-        session.setAttribute("user", user);
-        if ("Unverified".equals(user.getStatus())) {
-            model.addAttribute("user", user);
-            return "login";
-        } else {
-            User currentUser = aservice.findByEmail(principal.getName());
-            Favorite favoriteList = aservice.getFavoriteList(currentUser.getId());
-            Cart cartList = aservice.getCartList(currentUser.getId());
-            model.addAttribute("user", user);
-            model.addAttribute("likes", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
-            model.addAttribute("corz", cartList != null ? cartList.getItems() : new ArrayList<>());
-            session.setAttribute("user", user);
-            model.addAttribute("categories", aservice.getCategories());
-            session.setAttribute("categories", aservice.getCategories());
-            return redirect;
-        }
-    }
 
     @GetMapping("/contact")
     public String contact(Model model, HttpSession session, Principal principal) {
@@ -217,7 +200,7 @@ public class userController {
                                  HttpSession session,
                                  @ModelAttribute("currentUrl") String currentUrl) {
 
-        model.addAttribute("products", aservice.getAllProduct());
+        model.addAttribute("products", aservice.getAllProductShuffled());
         model.addAttribute("product", aservice.findProductById(pId));
         model.addAttribute("category", aservice.findCategoryByProductId(pId));
         model.addAttribute("subCategory", aservice.findSubCategoryByProductId(pId));
@@ -239,6 +222,13 @@ public class userController {
         return "redirect:/USER/detail/" + pId;
     }
 
+    @PostMapping("/cart/apply-promo")
+    public String applyPromoCode(@RequestParam("promoCode") String promoCode, Principal principal) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        aservice.applyPromoCode(currentUser.getId(), promoCode);
+        return "redirect:/USER/cart";
+    }
+
     @GetMapping("/cart")
     public String cart(Model model,
                        HttpSession session,
@@ -246,22 +236,20 @@ public class userController {
                        @ModelAttribute("currentUrl") String currentUrl,
                        @RequestParam(required = false) String promoCode) {
         User currentUser = aservice.findByEmail(principal.getName());
-        Cart cartList = aservice.getCartList(currentUser.getId());
         Cart cart = aservice.getCartList(currentUser.getId());
+
         int totalSum = cart.getItems().stream().mapToInt(CartItem::getPrice).sum();
         int shippingCost = totalSum > 1000 ? 0 : 100;
 
         double discountPercentage = 0;
-
-        if (promoCode != null && !promoCode.isEmpty()) {
-            PromoCode code = aservice.getPromoCodeByCode(promoCode);
-            if (code != null) {
-                discountPercentage = code.getDiscountPercentage();
-            }
+        if (cart.getPromoCode() != null) {
+            discountPercentage = cart.getPromoCode().getDiscountPercentage();
         }
 
         double discountAmount = totalSum * discountPercentage / 100;
         double finalTotal = totalSum - discountAmount + shippingCost;
+
+        Cart cartList = aservice.getCartList(currentUser.getId());
 
         model.addAttribute("cartList", cartList != null ? cartList : new Cart());
         model.addAttribute("user", currentUser);
@@ -307,33 +295,28 @@ public class userController {
         return "redirect:/USER/cart";
     }
 
-    @PostMapping("/USER/cart/applyPromoCode")
-    public String applyPromoCode(@RequestParam("promoCode") String promoCode, HttpSession session, RedirectAttributes redirectAttributes) {
-        session.setAttribute("promoCode", promoCode);
-        return "redirect:/USER/cart";
-    }
 
     @GetMapping("/checkout")
     public String checkout(Model model,
                            HttpSession session,
-                           Principal principal) {
+                           Principal principal,
+                           @ModelAttribute("currentUrl") String currentUrl,
+                           @RequestParam(required = false) String promoCode) {
         User currentUser = aservice.findByEmail(principal.getName());
-        Cart cartList = aservice.getCartList(currentUser.getId());
-        int totalSum = cartList.getItems().stream().mapToInt(CartItem::getPrice).sum();
+        Cart cart = aservice.getCartList(currentUser.getId());
+
+        int totalSum = cart.getItems().stream().mapToInt(CartItem::getPrice).sum();
         int shippingCost = totalSum > 1000 ? 0 : 100;
 
         double discountPercentage = 0;
-        String promoCode = (String) session.getAttribute("promoCode");
-
-        if (promoCode != null && !promoCode.isEmpty()) {
-            PromoCode code = aservice.getPromoCodeByCode(promoCode);
-            if (code != null) {
-                discountPercentage = code.getDiscountPercentage();
-            }
+        if (cart.getPromoCode() != null) {
+            discountPercentage = cart.getPromoCode().getDiscountPercentage();
         }
 
         double discountAmount = totalSum * discountPercentage / 100;
         double finalTotal = totalSum - discountAmount + shippingCost;
+
+        Cart cartList = aservice.getCartList(currentUser.getId());
 
         model.addAttribute("cartList", cartList != null ? cartList : new Cart());
         model.addAttribute("user", currentUser);
@@ -342,21 +325,66 @@ public class userController {
         model.addAttribute("discountPercentage", discountPercentage);
         model.addAttribute("discountAmount", discountAmount);
         model.addAttribute("finalTotal", finalTotal);
-        model.addAttribute("promoCode", promoCode);
-
         return getCurrentUser(model, session, principal, "checkout");
     }
 
+    @GetMapping("/search/{keyword}")
+    public String fullSearchProducts(@PathVariable("keyword") String keyword,
+                                     Model model,
+                                     Principal principal,
+                                     HttpSession session,
+                                     @ModelAttribute("currentUrl") String currentUrl) {
+        List<product> products = aservice.findByPnameContaining(keyword);
+        model.addAttribute("products", products);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("hasProducts", !products.isEmpty());
+        getProductActivity(model, principal, currentUrl);
+        return getCurrentUser(model, session, principal, "search_result");
+    }
 
+
+    @GetMapping("/category/{id}")
+    public String category(@PathVariable("id") String categoryID, Model model, HttpSession session,
+                                Principal principal, @ModelAttribute("currentUrl") String currentUrl) {
+        model.addAttribute("products", aservice.getProductsByCategory(categoryID));
+        model.addAttribute("user", session.getAttribute("user"));
+        model.addAttribute("categories", session.getAttribute("categories"));
+        model.addAttribute("curCat", aservice.findCategoryById(Integer.parseInt(categoryID)));
+        getProductActivity(model, principal, currentUrl);
+        return getCurrentUser(model, session, principal, "category_search");
+    }
 
     public void getProductActivity(Model model, Principal principal,@ModelAttribute("currentUrl") String currentUrl){
         User currentUser = aservice.findByEmail(principal.getName());
         Favorite favoriteList = aservice.getFavoriteList(currentUser.getId());
         Cart cartList = aservice.getCartList(currentUser.getId());
         model.addAttribute("favoriteList", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
-        model.addAttribute("cartList", cartList != null ? cartList.getItems() : new ArrayList<>());
+        model.addAttribute("cartList", cartList != null ? cartList : new Cart());
         model.addAttribute("currentUrl", currentUrl);
     }
 
+    private String getCurrentUser(Model model, HttpSession session, Principal principal, String redirect) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        User user = aservice.findByEmail(principal.getName());
+        session.setAttribute("user", user);
+        if ("Unverified".equals(user.getStatus())) {
+            model.addAttribute("user", user);
+            return "login";
+        } else {
+            User currentUser = aservice.findByEmail(principal.getName());
+            Favorite favoriteList = aservice.getFavoriteList(currentUser.getId());
+            Cart cartList = aservice.getCartList(currentUser.getId());
+            model.addAttribute("user", user);
+            model.addAttribute("likes", favoriteList != null ? favoriteList.getProducts() : new ArrayList<>());
+            model.addAttribute("corz", cartList != null ? cartList.getItems() : new ArrayList<>());
+            session.setAttribute("user", user);
+            model.addAttribute("categories", aservice.getCategories());
+            session.setAttribute("categories", aservice.getCategories());
+            return redirect;
+        }
+    }
 }
 

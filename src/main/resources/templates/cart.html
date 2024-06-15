@@ -67,9 +67,13 @@
                 </table>
             </div>
             <div class="col-lg-4">
-                <form class="mb-30" th:action="@{/USER/cart/applyPromoCode}" method="post">
-                    <input type="text" name="promoCode" placeholder="Введите Промокод" />
-                    <button type="submit" class="btn btn-primary">Подтвердить</button>
+                <form class="mb-30" action="/USER/cart/apply-promo" method="post">
+                    <div class="input-group">
+                        <input type="text" name="promoCode" class="form-control border-0 p-4" placeholder="Промокод">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">Подтвердить</button>
+                        </div>
+                    </div>
                 </form>
                 <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Сумма заказа</span></h5>
                 <div class="bg-light p-30 mb-5">
@@ -90,14 +94,14 @@
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Всего</h5>
-                            <h5 th:text="${finalTotal} + '₽'"></h5>
+                            <h5 th:text="${#numbers.formatDecimal(finalTotal, 1, 'COMMA', 2, 'POINT')} + ' ₽'"></h5>
                         </div>
                         <form th:action="@{/USER/checkout}" method="get">
                             <input type="hidden" name="promoCode" th:value="${promoCode}" />
                             <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Заказать</button>
                         </form>
                     </div>
-                    <small class="text-center">При покупке от 1000 рублей доставка бесплатная</small>
+                    <small class="text-center">При покупке от 1000 рублей доставка бесплатная (учитывается стоимость товаров)</small>
                 </div>
             </div>
         </div>

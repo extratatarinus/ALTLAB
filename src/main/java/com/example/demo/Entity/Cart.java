@@ -18,6 +18,18 @@ public class Cart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items;
 
+    @ManyToOne
+    @JoinColumn(name = "promocode_id")
+    private PromoCode promoCode;
+
+    public PromoCode getPromoCode() {
+        return promoCode;
+    }
+
+    public void setPromoCode(PromoCode promoCode) {
+        this.promoCode = promoCode;
+    }
+
     public List<CartItem> getItems() {
         return items;
     }
@@ -57,6 +69,17 @@ public class Cart {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private List<product> products;
+
+    public boolean containsProduct(product product) {
+        if (items != null) {
+            for (CartItem item : items) {
+                if (item.getProduct().equals(product)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 
 }

@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import com.example.demo.Entity.*;
 import com.example.demo.Repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -502,7 +505,41 @@ public class adminService {
         }
     }
 
+    @Transactional
+    public void applyPromoCode(int userId, String code) {
+        Cart cart = cartrepo.findByUserId(userId);
+        if (cart != null) {
+            PromoCode promoCode = pcrepo.findByCode(code);
+            if (promoCode != null) {
+                cart.setPromoCode(promoCode);
+                cartrepo.save(cart);
+            }
+        }
+    }
+
     public PromoCode getPromoCodeByCode(String code) {
         return pcrepo.findByCode(code);
+    }
+
+    public List<product> findByPnameContaining(String keyword){
+        return prepo.findByPnameContaining(keyword);
+    }
+
+    public List<product> findTop8ByOrderByAddDateDesc(Pageable pageable) {
+        return prepo.findTop8ByOrderByAddDateDesc(pageable);
+    }
+
+    public List<product> findTop8ByOrderByReviewsCountDesc(Pageable pageable) {
+        return prepo.findTop8ByOrderByReviewsCountDesc(pageable);
+    }
+
+    public List<product> getAllProductShuffled() {
+        List<product> products = prepo.findAll();
+        Collections.shuffle(products);
+        return products;
+    }
+
+    public List<product> getProductsByCategory(String categoryId) {
+        return prepo.findProductsByCategoryId(categoryId);
     }
 }
