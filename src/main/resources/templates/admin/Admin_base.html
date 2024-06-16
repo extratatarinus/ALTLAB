@@ -42,12 +42,11 @@
         </div>
         <!-- Spinner End -->
 
-
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
             <nav class="navbar bg-light navbar-light">
                 <a href="index.html" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>DASHMIN</h3>
+                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>ALT LAB</h3>
                 </a>
                 <div class="d-flex align-items-center ms-4 mb-4">
                     <div class="position-relative">
@@ -55,63 +54,36 @@
                         <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
                     </div>
                     <div class="ms-3">
-                        <h6 class="mb-0" th:text="${user.name}"></h6>
-                        <span>Admin</span>
+                        <h6 class="mb-0" th:text="${user.name}">Jhon Doe</h6>
+                        <span th:text="${user.role}">Admin</span>
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a th:href="@{/ADMIN/category}" class="nav-item nav-link active"><i class="fa fa-plus me-2"></i>Category</a>
-					
-			<!--<div class="nav-item dropdown">
-					     <a href="#" class="nav-link dropdown-toggle" ><i class="fa fa-laptop me-2"></i>Elements</a>
-					     <div class="dropdown-menu bg-transparent border-0" th:each="c:${categories}" >
-					         <a href="button.html" class="dropdown-item" th:text="${c.cname}"></a>
-							 <ul class="dropdown-menu">
-					
-							           <li>
-							              <a class="dropdown-item" th:each="sc:${c.subCategory}" th:text="${sc.subName}">subcat</a>
-							           </li>
-							         </ul>	
-					      </div>
-						  </div>-->
-						  <div class="nav-item dropdown">
-						              <a
-						                href="#"
-						                class="nav-link dropdown-toggle"
-						                data-bs-toggle="dropdown"
-						              >
-						                <i class="fa fa-laptop me-2"></i>Elements
-						              </a>
-						              <div class="dropdown-menu bg-transparent border-0">
-						                  <!-- Loop through categories -->
-						                  <div th:each="c : ${categories}" class="dropdown-submenu">
-						                      <a class="dropdown-item" href="#" th:text="${c.cname}"></a>
-						                      <ul class="dropdown-submenu">
-						                          <!-- Loop through subcategories -->
-						                          <li th:each="sc : ${c.subCategory}">
-						                              <a class="dropdown-item" th:text="${sc.subName}" th:href="@{'/ADMIN/viewSubCategory/'+${sc.subId}}"></a>
-						                          </li>
-						                      </ul>
-						                  </div>
-						              </div>
-						          </div>
-						  <!--<div class="nav-item dropdown">
-						      <a href="#" class="nav-link dropdown-toggle" ><i class="fa fa-laptop me-2"></i>Elements</a>
-						      <div class="dropdown-menu bg-transparent border-0" th:each="c:${categories}">
-						          <a href="button.html" class="dropdown-item" th:text="${c.cname}">	</a>
-						          <div class="dropdown-menu" th:each="sc:${c.subCategory}" style="display: none;">
-						              <a class="dropdown-item" th:text="${sc.subName}">subcat</a>
-						          </div>
-						      </div>
-						  </div>-->
-						
-
-						   
-						  
-                    <a th:href="@{/ADMIN/add_admin_form?role=ADMIN}" class="nav-item nav-link"><i class="fa fa-user me-2"></i>Add Admin</a>
+                    <a th:href="@{/ADMIN/home}" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fa  fa-gift me-2"></i>Products
+                        </a>
+                        <div class="dropdown-menu bg-transparent border-0">
+                            <div th:each="c : ${categories}" class="dropdown-submenu">
+                                <a class="dropdown-item" href="#" th:text="${c.cname}"></a>
+                                <ul class="dropdown-submenu">
+                                    <li th:each="sc : ${c.subCategory}">
+                                        <a class="dropdown-item" th:text="${sc.subName}"
+                                           th:href="@{'/ADMIN/viewSubCategory/'+${sc.subId}}"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <a th:href="@{/ADMIN/category}" class="nav-item nav-link"><i class="fa fa-folder me-2"></i>Category</a>
                     <a th:href="@{/ADMIN/add_product_form}" class="nav-item nav-link"><i class="fa fa-plus me-2"></i>Add Product</a>
-                    <a th:href="@{/ADMIN/request}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Request &nbsp; &nbsp;<span class="badge bg-secondary text-light" th:text="${rcount}"></span></a>
-                    <a th:href="@{/ADMIN/users}" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Users</a>
+                    <a th:href="@{/ADMIN/users}" class="nav-item nav-link"><i class="fa fa-user me-2"></i>Users</a>
+                    <a th:href="@{/ADMIN/request}" class="nav-item nav-link"><i class="fa fa-check me-2"></i>Request &nbsp; &nbsp;<span class="badge bg-secondary text-light" th:text="${rcount}"></span></a>
+                    <a href="widget.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Widgets</a>
+                    <a href="form.html" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
+                    <a href="table.html" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Tables</a>
+                    <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Pages</a>
                         <div class="dropdown-menu bg-transparent border-0">
@@ -126,20 +98,12 @@
         </div>
         <!-- Sidebar End -->
 
-
-        <!-- Content Start -->
         <div class="content">
             <!-- Navbar Start -->
             <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
                 <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
                     <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
                 </a>
-                <a href="#" class="sidebar-toggler flex-shrink-0">
-                    <i class="fa fa-bars"></i>
-                </a>
-                <form class="d-none d-md-flex ms-4">
-                    <input class="form-control border-0" type="search" placeholder="Search">
-                </form>
                 <div class="navbar-nav align-items-center ms-auto">
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -206,8 +170,8 @@
                     </div>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img class="rounded-circle me-lg-2" th:src="@{'/image/'+${user.imgPath}}" alt="" style="width: 40px; height: 40px;">
-                            <span class="d-none d-lg-inline-flex" th:text="${user.name}"></span>
+                            <img class="rounded-circle me-lg-2" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex">John Doe</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                             <a href="#" class="dropdown-item">My Profile</a>
@@ -218,7 +182,6 @@
                 </div>
             </nav>
             <!-- Navbar End -->
-			
 			<div th:replace="${content}" id="main" class="main" ></div>
 		
            

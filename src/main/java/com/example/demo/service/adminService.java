@@ -48,7 +48,6 @@ public class adminService {
 
     private final sunCatRepository srepo;
 
-    private final brandRepository brepo;
 
     public adminService(CartRepository cartrepo,
                         PromocodeRepository pcrepo,
@@ -57,7 +56,6 @@ public class adminService {
                         catRepository crepo,
                         productRepository prepo,
                         sunCatRepository srepo,
-                        brandRepository brepo,
                         reviewsRepository rrepo,
                         favoriteRepository frepo,
                         CartItemRepository cartitemrepo,
@@ -73,7 +71,6 @@ public class adminService {
         this.crepo = crepo;
         this.prepo = prepo;
         this.srepo = srepo;
-        this.brepo = brepo;
         this.rrepo = rrepo;
         this.frepo = frepo;
     }
@@ -146,14 +143,13 @@ public class adminService {
         return crepo.findAll();
     }
 
-    public void add_product(product product, MultipartFile file, String bid) throws IllegalStateException, IOException {
+    public void add_product(product product, MultipartFile file, String subId) throws IllegalStateException, IOException {
         String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
         String nPath = folderPath + file.getOriginalFilename();
         String search = "image\\";
         int i = nPath.indexOf(search);
 
         product p = new product();
-        Brand b = brepo.findById(bid).get();
 
         if (file.isEmpty()) {
             p.setImgPath("");
@@ -161,11 +157,12 @@ public class adminService {
             file.transferTo(new File(nPath));
             p.setImgPath(nPath.substring(i + search.length()));
         }
+        p.setSubCategory(srepo.findSubCategoryById(subId));
         p.setPid(product.getPid());
-        p.setBrand(b);
         p.setPname(product.getPname());
-        p.setBrand(product.getBrand());
         p.setDescription(product.getDescription());
+        p.setInformation(product.getInformation());
+        p.setShortDescription(product.getShortDescription());
         p.setPrice(product.getPrice());
         p.setAddDate(LocalDate.now());
         p.setStatus("Unsold");
@@ -228,71 +225,11 @@ public class adminService {
         }
     }
 
-    public List<Brand> getBrands(String subId) {
-        return brepo.getBrands(subId);
-    }
-
-    public void addBrand(String name, String subId, MultipartFile file) throws IllegalStateException, IOException {
-        Brand b = new Brand();
-        subCategory sc = srepo.findById(subId).get();
-        if (file.isEmpty()) {
-            b.setImgPath("");
-        } else {
-            String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
-            String npath = folderPath + file.getOriginalFilename();
-            String search = "image\\";
-            int i = npath.indexOf(search);
-            file.transferTo(new File(npath));
-            b.setImgPath(npath.substring(i + search.length()));
-        }
-
-        if (getBrands(subId).isEmpty()) {
-            String sname = sc.getSubName().replace(" ", "");
-            b.setBid(sname + 1);
-        } else {
-            Brand br = brepo.findLastAddedBrand(subId);
-            String lid = br.getBid();
-            int l = sc.getSubName().length();
-            int num = Integer.parseInt(lid.substring(l)) + 1;
-            b.setBid(sc.getSubName() + num);
-        }
-        b.setCreatedAt(LocalDateTime.now());
-        b.setSubCategory(sc);
-        b.setBname(name);
-        brepo.save(b);
-    }
-
-    public Brand findBrandById(String id) {
-        return brepo.findById(id).get();
-    }
-
-    @Transactional
-    public void updateBrand(String bname, MultipartFile file, String bid) throws IllegalStateException, IOException {
-        Brand br = findBrandById(bid);
-        if (file.isEmpty()) {
-            brepo.updateBrand(bname, br.getImgPath(), bid);
-        } else {
-            String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
-            String npath = folderPath + file.getOriginalFilename();
-            String search = "image\\";
-            int i = npath.indexOf(search);
-            file.transferTo(new File(npath));
-            brepo.updateBrand(bname, npath.substring(i + search.length()), bid);
-        }
-    }
-
-    public void deleteBrand(String bid) {
-        brepo.deleteById(bid);
-    }
-
     public int findCatFromSubCat(String sid) {
         subCategory s = srepo.findById(sid).get();
         return s.getCategory().getCid();
     }
 
-    public List<product> findProductsByBid(String bid) {
-        return prepo.findProductByBId(bid);
-    }
 
     public void deleteSubById(String subId) {
         srepo.deleteById(subId);
@@ -441,10 +378,6 @@ public class adminService {
             favoriteList.getProducts().remove(product);
             frepo.save(favoriteList);
         }
-    }
-
-    public subCategory findSubCategoryByBrandId(String brandId) {
-        return brepo.findSubCategoryByBrandId(brandId);
     }
 
     public Cart getCartList(int userId) {

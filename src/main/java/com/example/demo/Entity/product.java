@@ -28,52 +28,18 @@ public class product {
 
     private String Information;
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    private int quantity;
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Reviews> reviews;
 
     @ManyToOne
-    @JoinColumn(name = "bid")
-    private Brand brand;
-
-    public List<Favorite> getFavoriteLists() {
-        return favoriteLists;
-    }
-
-    public void setFavoriteLists(List<Favorite> favoriteLists) {
-        this.favoriteLists = favoriteLists;
-    }
-
-    public String getInformation() {
-        return Information;
-    }
-
-    public void setInformation(String information) {
-        Information = information;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
-    }
+    @JoinColumn(name = "subCategoryId", referencedColumnName = "subId")
+    private subCategory subCategory;
 
     @ManyToMany(mappedBy = "products")
     private List<Favorite> favoriteLists;
 
     public product(Long pid, String pname, String description, String imgPath, String price,
-                   LocalDate addDate, String status, Brand brand) {
+                   LocalDate addDate, String status) {
         super();
         this.pid = pid;
         this.pname = pname;
@@ -82,7 +48,14 @@ public class product {
         this.price = price;
         this.status = status;
         this.addDate = addDate;
-        this.brand = brand;
+    }
+
+    public List<Favorite> getFavoriteLists() {
+        return favoriteLists;
+    }
+
+    public void setFavoriteLists(List<Favorite> favoriteLists) {
+        this.favoriteLists = favoriteLists;
     }
 
     public String getStatus() {
@@ -141,20 +114,36 @@ public class product {
         this.addDate = addDate;
     }
 
-    public Brand getBrand() {
-        return brand;
-    }
-
-    public void setBrand(Brand brand) {
-        this.brand = brand;
-    }
-
     public List<Reviews> getReviews() {
         return reviews;
     }
 
     public void setReviews(List<Reviews> reviews) {
         this.reviews = reviews;
+    }
+
+    public com.example.demo.Entity.subCategory getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(com.example.demo.Entity.subCategory subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getInformation() {
+        return Information;
+    }
+
+    public void setInformation(String information) {
+        Information = information;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     public product() {

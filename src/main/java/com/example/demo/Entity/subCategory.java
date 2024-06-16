@@ -26,9 +26,6 @@ public class subCategory {
     @Column(name = "imgPath")
     private String imgPath;
 
-    @OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL)
-    public List<Brand> brand;
-
     public String getImgPath() {
         return imgPath;
     }
@@ -44,6 +41,9 @@ public class subCategory {
     public void setCreatedAt(LocalDateTime localDate) {
         this.createdAt = localDate;
     }
+
+    @OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL)
+    private List<product> products;
 
     @ManyToOne
     @JoinColumn(name = "cid", referencedColumnName = "cid")

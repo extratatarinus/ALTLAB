@@ -6,7 +6,6 @@ import java.security.Principal;
 import java.util.List;
 
 import com.example.demo.Entity.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +41,7 @@ public class adminController {
 		session.setAttribute("user", aservice.findByEmail(email));
 		session.setAttribute("categories", aservice.getCategories());
 		model.addAttribute("categories", aservice.getCategories());
-		return "admin_home";
+		return "admin/admin_home";
 	}
 
 	@GetMapping("/add_admin_form")
@@ -51,14 +50,13 @@ public class adminController {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		session.setAttribute("role", role);
-		return "add_admin_form";
+		return "admin/add_admin_form";
 	}
 
 	@PostMapping("/register_admin")
 	public void register_admin(HttpServletResponse response, @ModelAttribute User user,
 			@RequestParam("image") MultipartFile file, Model model, HttpSession session) throws IOException {
 		System.out.println(file.getOriginalFilename());
-		// String role=(String) session.getAttribute("role");
 		aservice.admin_register(user, file, (String) session.getAttribute("role"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		response.sendRedirect("/ADMIN/add_admin_form");
@@ -70,7 +68,7 @@ public class adminController {
 		List<com.example.demo.Entity.category> clist = aservice.getCategories();
 		model.addAttribute("clist", clist);
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		return "add_product_form";
+		return "admin/add_product_form";
 	}
 
 	@GetMapping("/subCategories")
@@ -82,9 +80,9 @@ public class adminController {
 
 	@PostMapping("/add_product")
 	public void add_product(Model model, HttpSession session, @ModelAttribute product p,
-			@RequestParam("image") MultipartFile file, @RequestParam("brand") String brand,
+			@RequestParam("image") MultipartFile file, @RequestParam("subCategory") String subCategory,
 			HttpServletResponse response) throws IllegalStateException, IOException {
-		aservice.add_product(p, file, brand);
+		aservice.add_product(p, file, subCategory);
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		response.sendRedirect("/ADMIN/add_product_form");
 	}
@@ -95,7 +93,7 @@ public class adminController {
 		List<com.example.demo.Entity.category> list = aservice.getCategories();
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		model.addAttribute("categories", list);
-		return "category";
+		return "admin/category";
 
 	}
 
@@ -115,7 +113,7 @@ public class adminController {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		return "updateCategory";
+		return "admin/updateCategory";
 	}
 
 	@PostMapping("updateCat/{id}")
@@ -134,7 +132,7 @@ public class adminController {
 		model.addAttribute("subCategory", slist);
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		session.setAttribute("cid", id);
-		return "sub_category";
+		return "admin/sub_category";
 	}
 
 	@PostMapping("/add_subCategory")
@@ -158,7 +156,7 @@ public class adminController {
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("vsub", aservice.findSubCategory(id));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		return "viewSubCategory";
+		return "admin/viewSubCategory";
 	}
 
 	@GetMapping("/update_subCat/{id}")
@@ -168,7 +166,7 @@ public class adminController {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		return "updateCatForm";
+		return "admin/updateCatForm";
 	}
 
 	@PostMapping("/updateSub/{id}")
@@ -203,64 +201,6 @@ public class adminController {
 
 	}
 
-	@GetMapping("/brands/{id}")
-	public String brands(@PathVariable("id") String subId, Model model, HttpSession session) {
-		List<Brand> blist = aservice.getBrands(subId);
-		model.addAttribute("blist", blist);
-		model.addAttribute("user", session.getAttribute("user"));
-		model.addAttribute("categories", session.getAttribute("categories"));
-		session.setAttribute("subId", subId);
-		return "brands";
-	}
-
-	@PostMapping("/add_brand")
-	public String add_brand(@RequestParam("name") String name, @RequestParam("image") MultipartFile file, Model model,
-			HttpSession session, HttpServletResponse response) throws IllegalStateException, IOException {
-		model.addAttribute("user", session.getAttribute("user"));
-		model.addAttribute("categories", session.getAttribute("categories"));
-		String subId = (String) session.getAttribute("subId");
-		aservice.addBrand(name, subId, file);
-		return "redirect:/ADMIN/brands/" + subId;
-	}
-
-	@GetMapping("/brand")
-	@ResponseBody
-	public List<Brand> getBrands(@RequestParam("subCategoryId") String subId) {
-		return aservice.getBrands(subId);
-	}
-
-	@GetMapping("/update_brand_form/{bid}")
-	public String update_brand_form(@PathVariable("bid") String bid, Model model, HttpSession session) {
-		model.addAttribute("user", session.getAttribute("user"));
-		model.addAttribute("categories", session.getAttribute("categories"));
-		model.addAttribute("rcount", session.getAttribute("rcount"));
-		model.addAttribute("brand", aservice.findBrandById(bid));
-		session.setAttribute("subID", aservice.findBrandById(bid).getSubCategory().getSubId());
-		return "update_brand_form";
-	}
-
-	@PostMapping("/updateBrand/{bid}")
-	public String updateBrand(@PathVariable("bid") String bid, @RequestParam("name") String name,
-			@RequestParam("image") MultipartFile file, Model model, HttpSession session, HttpServletResponse response)
-			throws IllegalStateException, IOException {
-		aservice.updateBrand(name, file, bid);
-		model.addAttribute("user", session.getAttribute("user"));
-		model.addAttribute("categories", session.getAttribute("categories"));
-		model.addAttribute("rcount", session.getAttribute("rcount"));
-		return "redirect:/ADMIN/brands/" + session.getAttribute("subID");
-	}
-
-	@PostMapping("/delete_brand/{id}")
-	public String deleteBrand(@PathVariable("id") String bid, Model model, HttpSession session,
-			HttpServletResponse response) throws IOException {
-		model.addAttribute("user", session.getAttribute("user"));
-		model.addAttribute("categories", session.getAttribute("categories"));
-		model.addAttribute("rcount", session.getAttribute("rcount"));
-		String subID = aservice.findSubCategoryByBrandId(bid).getSubId();
-		aservice.deleteBrand(bid);
-		return "redirect:/ADMIN/brands/" + subID;
-	}
-
 	@GetMapping("/request")
 	public String request(Model model, HttpSession session) {
 		List<User> rlist = aservice.findByStatus("Unverified");
@@ -268,15 +208,14 @@ public class adminController {
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
-		return "request";
+		return "admin/request";
 	}
 
 	@GetMapping("/products/{id}")
 	public String products(@PathVariable("id") String id, Model model, HttpSession session) {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
-		model.addAttribute("plist", aservice.findProductsByBid(id));
-		return "products";
+		return "admin/products";
 	}
 	
 	@GetMapping("/update_product_form/{id}")
@@ -285,23 +224,9 @@ public class adminController {
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
-		return "update_product_form";
+		return "admin/update_product_form";
 	}
-	
-	@PostMapping("/updateProduct/{id}")
-	public void updateProduct(@PathVariable("id")Long id, Model model,HttpSession session,HttpServletResponse response,
-			@RequestParam("name")String pname,@RequestParam("price")String price,@RequestParam("description")String description,
-			@RequestParam("image")MultipartFile file) throws IllegalStateException, IOException {
-		aservice.updateProduct(pname, price, description, file, id);
-		response.sendRedirect("/ADMIN/products/"+aservice.findProductById(id).getBrand().getBid());
-	}
-	@GetMapping("/delete_product/{id}")
-	public void deleteProduct(@PathVariable("id")Long pid,Model model,HttpSession session,HttpServletResponse response) throws IOException {
-		String bid=aservice.findProductById(pid).getBrand().getBid();
-		aservice.deleteProduct(pid);
-		response.sendRedirect("/ADMIN/products/"+bid);
-	}
-	
+
 	
 	@GetMapping("/verify/{id}")
 	public void verify(Model model, HttpSession session, @PathVariable("id") int id, HttpServletResponse response)
@@ -330,7 +255,7 @@ public class adminController {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		return "users";
+		return "admin/users";
 	}
 
 	@GetMapping("/userUpdateForm/{id}")
@@ -339,7 +264,7 @@ public class adminController {
 		model.addAttribute("updateUser", user);
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
-		return "userUpdateForm";
+		return "admin/userUpdateForm";
 	}
 
 	@PostMapping("/updateUser/{id}")

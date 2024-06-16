@@ -18,7 +18,9 @@ public interface sunCatRepository extends JpaRepository<subCategory, String> {
 	
 	@Query("select s from subCategory s where s.subName= :sname order by s.createdAt DESC LIMIT 1")
 	subCategory findLatestSubCategoryBySubName(@Param("sname")String sname);
-	
+
+	@Query("SELECT s FROM subCategory s WHERE s.subId = :subId")
+	subCategory findSubCategoryById(@Param("subId") String subId);
 	
 	@Modifying
 	@Query("update subCategory s set s.subName= :sname, s.imgPath= :img where s.subId= :id")
