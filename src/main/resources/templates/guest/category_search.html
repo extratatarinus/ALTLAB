@@ -1,0 +1,110 @@
+<html th:replace="base::layout(~{::section})">
+<head>
+
+</head>
+<body>
+	<section class="py-4">
+
+		<!-- Breadcrumb Start -->
+		<div class="container-fluid">
+			<div class="row px-xl-5">
+				<div class="col-12">
+					<nav class="breadcrumb bg-light mb-30">
+						<a class="breadcrumb-item text-dark" th:href="@{/USER/home}">Главная</a>
+						<a class="breadcrumb-item text-dark" >Категории</a>
+						<a class="breadcrumb-item text-dark" th:text="${curCat.cname}" ></a>
+					</nav>
+				</div>
+			</div>
+		</div>
+		<!-- Breadcrumb End -->
+
+		<!-- Shop Start -->
+		<div class="container-fluid">
+			<div class="row px-xl-5">
+				<!-- Shop Product Start -->
+				<div class="container px-4 px-lg-5 mt-5">
+					<div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+						<!-- Product -->
+						<div class="col-lg-4 col-md-6 col-sm-6 pb-1" th:each="product : ${products}">
+							<div class="product-item bg-light mb-4">
+								<div class="product-img position-relative overflow-hidden">
+									<img class="img-fluid w-100" th:src="@{'/image/' + ${product.imgPath}}" alt="">
+									<div class="product-action">
+										<a class="btn btn-outline-dark btn-square" th:href="@{'/cat/cart'}"><i class="fa fa-shopping-cart"></i></a>
+										<a class="btn btn-outline-dark btn-square" th:href="@{'/cat/favorites'}"><i class="far fa-heart"></i></a>
+										<a class="btn btn-outline-dark btn-square" th:href="@{'/detail/'+ ${product.pid}}"><i class="fa fa-search"></i></a>
+									</div>
+								</div>
+								<div class="text-center py-4">
+									<a class="h6 text-decoration-none text-center" th:text="${product.pname}" th:href="@{'/USER/detail/'+ ${product.pid}}"></a>
+									<div class="d-flex align-items-center justify-content-center mt-2">
+										<h5><span th:text="'Цена: ' + ${product.price} + '₽'"></span></h5>
+										<h6 class="text-muted ml-2"><del></del></h6>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- Product end -->
+					</div>
+				</div>
+				<!-- Shop Product End -->
+			</div>
+		</div>
+		<!-- Shop End -->
+		<!-- Shop End -->
+		<!-- Modal -->
+		<div th:if="${session.favPlaced != null}" class="modal fade show" id="favConfirmationModal"
+			 tabindex="-1" role="dialog" aria-labelledby="favConfirmationModalLabel" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="favConfirmationModalLabel">Внимание!</h5>
+					</div>
+					<div class="modal-body">
+						Чтобы добавить данный товар в избранное или посмотреть свой список избранного,
+						нужно войти в свой аккаунт или создать новый!
+					</div>
+					<div class="modal-footer">
+						<form method="post" th:action="@{/cat/clearPlacedFlag}">
+							<button type="submit" class="btn btn-primary">Закрыть</button>
+						</form>
+						<form method="get" th:action="@{/login}">
+							<button type="submit" class="btn btn-primary">Войти</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:if="${session.favPlaced != null}" class="modal-backdrop fade show"></div>
+		<!-- Modal end -->
+		<!-- Modal -->
+		<div th:if="${session.cartPlaced != null}" class="modal fade show" id="cartConfirmationModal"
+			 tabindex="-1" role="dialog" aria-labelledby="cartConfirmationModalLabel"
+			 aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="cartConfirmationModalLabel">Внимание!</h5>
+					</div>
+					<div class="modal-body">
+						Чтобы добавить данный товар в корзину или посмотреть свою корзину,
+						нужно войти в свой аккаунт или создать новый!
+					</div>
+					<div class="modal-footer">
+						<form method="post" th:action="@{/cat/clearPlacedFlag}">
+							<button type="submit" class="btn btn-primary">Закрыть</button>
+						</form>
+						<form method="get" th:action="@{/login}">
+							<button type="submit" class="btn btn-primary">Войти</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:if="${session.cartPlaced != null}" class="modal-backdrop fade show"></div>
+		<!-- Modal end -->
+	</section>
+</body>
+
+</html>

@@ -27,40 +27,63 @@
             <div class="col-lg-8">
                 <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Ваши данные</span></h5>
                 <div class="bg-light p-30 mb-5">
-                    <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>Имя</label>
-                            <input class="form-control" type="text" placeholder="Имя">
+                    <form method="post" th:action="@{/USER/order/place}" th:object="${orderDto}">
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>Имя</label>
+                                <input class="form-control" type="text" th:field="*{firstName}">
+                                <div th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="text-danger"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Фамилия</label>
+                                <input class="form-control" type="text" th:field="*{lastName}">
+                                <div th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="text-danger"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>E-mail</label>
+                                <input type="text" class="form-control" th:value="${user.email}" readonly>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Номер телефона</label>
+                                <input class="form-control" type="text" th:field="*{phone}">
+                                <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="text-danger"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Адрес</label>
+                                <input class="form-control" type="text"  th:field="*{address}">
+                                <div th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="text-danger"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Город</label>
+                                <input class="form-control" type="text" th:field="*{city}">
+                                <div th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="text-danger"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Регион</label>
+                                <input class="form-control" type="text" th:field="*{region}">
+                                <div th:if="${#fields.hasErrors('region')}" th:errors="*{region}" class="text-danger"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Индекс</label>
+                                <input class="form-control" type="text" th:field="*{zipCode}">
+                                <div th:if="${#fields.hasErrors('zipCode')}" th:errors="*{zipCode}" class="text-danger"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Способ оплаты</label>
+                                <select class="form-control" th:field="*{paymentMethod}">
+                                    <option value="СБП">СБП</option>
+                                    <option value="Карта">Банковская карта</option>
+                                    <option value="Телефон">Мобильный телефон</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="totalSum" th:value="${totalSum}">
+                            <input type="hidden" name="shippingCost" th:value="${shippingCost}">
+                            <input type="hidden" name="discountPercentage" th:value="${discountPercentage}">
+                            <input type="hidden" name="discountAmount" th:value="${discountAmount}">
+                            <input type="hidden" name="finalTotal" th:value="${finalTotal}">
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>Фамилия</label>
-                            <input class="form-control" type="text" placeholder="Фамилия">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>E-mail</label>
-                            <input type="text" class="form-control" id="name" th:value="${user.email}" readonly>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Номер телефона</label>
-                            <input class="form-control" type="text" placeholder="+7 (456) 789 24-51">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Адрес</label>
-                            <input class="form-control" type="text" placeholder="Адрес">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Город</label>
-                            <input class="form-control" type="text" placeholder="Город">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Регион</label>
-                            <input class="form-control" type="text" placeholder="Регион">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Индекс</label>
-                            <input class="form-control" type="text" placeholder="Индекс">
-                        </div>
-                    </div>
+                        <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">Оформить заказ</button>
+                    </form>
                 </div>
             </div>
             <div class="col-lg-4">
@@ -78,7 +101,7 @@
                             <h6>Стоимость товаров</h6>
                             <h6 th:text="${totalSum} + '₽'"></h6>
                         </div>
-                        <div class="d-flex justify-content-between mb-3">
+                        <div class="d-flex justify-content-between">
                             <h6 class="font-weight-medium">Доставка</h6>
                             <h6 class="font-weight-medium" th:text="${shippingCost} + '₽'"></h6>
                         </div>
@@ -92,30 +115,6 @@
                             <h5>Всего</h5>
                             <h5 th:text="${#numbers.formatDecimal(finalTotal, 1, 'COMMA', 2, 'POINT')} + ' ₽'"></h5>
                         </div>
-                    </div>
-                </div>
-                <div class="mb-5">
-                    <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
-                    <div class="bg-light p-30">
-                        <div class="form-group">
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="paypal">
-                                <label class="custom-control-label" for="paypal">Paypal</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="directcheck">
-                                <label class="custom-control-label" for="directcheck">Direct Check</label>
-                            </div>
-                        </div>
-                        <div class="form-group mb-4">
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="banktransfer">
-                                <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
-                            </div>
-                        </div>
-                        <button class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
                     </div>
                 </div>
             </div>

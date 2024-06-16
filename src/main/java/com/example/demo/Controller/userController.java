@@ -3,13 +3,17 @@ package com.example.demo.Controller;
 import java.security.Principal;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.example.demo.Entity.*;
+import com.example.demo.Validatoin.OrderDto;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.service.adminService;
@@ -36,6 +40,12 @@ public class userController {
         model.addAttribute("newProducts", newProducts);
         getProductActivity(model,principal,currentUrl);
         return getCurrentUser(model, session, principal, "user_home");
+    }
+
+    @PostMapping("/home/clearOrderPlacedFlag")
+    public String clearOrderPlacedFlag(HttpSession session) {
+        session.removeAttribute("orderPlaced");
+        return "redirect:/USER/home";
     }
 
     @GetMapping("/subCategories/{id}")
@@ -239,7 +249,7 @@ public class userController {
         Cart cart = aservice.getCartList(currentUser.getId());
 
         int totalSum = cart.getItems().stream().mapToInt(CartItem::getPrice).sum();
-        int shippingCost = totalSum > 1000 ? 0 : 100;
+        int shippingCost = totalSum > 1000 || totalSum <= 0 ? 0 : 100;
 
         double discountPercentage = 0;
         if (cart.getPromoCode() != null) {
@@ -325,7 +335,62 @@ public class userController {
         model.addAttribute("discountPercentage", discountPercentage);
         model.addAttribute("discountAmount", discountAmount);
         model.addAttribute("finalTotal", finalTotal);
+        model.addAttribute("orderDto", new OrderDto());
         return getCurrentUser(model, session, principal, "checkout");
+    }
+
+    @PostMapping("/order/place")
+    public String placeOrder(Principal principal,
+                             @Valid @ModelAttribute("orderDto") OrderDto orderDto,
+                             BindingResult bindingResult,
+                             @RequestParam int totalSum,
+                             @RequestParam int shippingCost,
+                             @RequestParam double discountPercentage,
+                             @RequestParam double discountAmount,
+                             @RequestParam double finalTotal,
+                             Model model,
+                             HttpSession session) {
+
+        if (bindingResult.hasErrors()) {
+            User currentUser = aservice.findByEmail(principal.getName());
+            Cart cart = aservice.getCartList(currentUser.getId());
+
+            model.addAttribute("cartList", cart != null ? cart : new Cart());
+            model.addAttribute("user", currentUser);
+            model.addAttribute("totalSum", totalSum);
+            model.addAttribute("shippingCost", shippingCost);
+            model.addAttribute("discountPercentage", discountPercentage);
+            model.addAttribute("discountAmount", discountAmount);
+            model.addAttribute("finalTotal", finalTotal);
+
+            return getCurrentUser(model, session, principal, "checkout");
+        }
+
+        User currentUser = aservice.findByEmail(principal.getName());
+        Cart cart = aservice.getCartList(currentUser.getId());
+
+        List<OrderItem> items = cart.getItems().stream().map(cartItem -> {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setProduct(cartItem.getProduct());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setPrice(cartItem.getPrice());
+            return orderItem;
+        }).collect(Collectors.toList());
+
+        aservice.placeOrder(currentUser.getId(), orderDto.getFirstName(), orderDto.getLastName(), orderDto.getPhone(), orderDto.getAddress(), orderDto.getCity(), orderDto.getRegion(), orderDto.getZipCode(), orderDto.getPaymentMethod(), totalSum, shippingCost, discountPercentage, discountAmount, finalTotal, items);
+
+        aservice.clearCart(currentUser.getId());
+
+        session.setAttribute("orderPlaced", true);
+
+        return "redirect:/USER/home";
+    }
+
+    @GetMapping("/order/confirmation")
+    public String orderConfirmation(Model model, Principal principal) {
+        User currentUser = aservice.findByEmail(principal.getName());
+        model.addAttribute("user", currentUser);
+        return "order_confirmation";
     }
 
     @GetMapping("/search/{keyword}")

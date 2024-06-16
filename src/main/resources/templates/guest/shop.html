@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{base::layout(~{::section})}">
+<head>
+    <title>Shop</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<section>
+    <!-- Breadcrumb Start -->
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <nav class="breadcrumb bg-light mb-30">
+                    <a class="breadcrumb-item text-dark" th:href="@{/USER/home} ">Главная</a>
+                    <span class="breadcrumb-item active">Список товаров</span>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Shop Start -->
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <!-- Shop Sidebar Start -->
+            <div class="col-lg-3 col-md-4">
+                <!-- Price Start -->
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Цена</span></h5>
+                <div class="bg-light p-4 mb-30">
+                    <form method="get" action="/shop" id="priceForm">
+                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            <input type="checkbox" class="custom-control-input" id="price-1" name="priceRanges" value="0-100"
+                                   th:checked="${priceRanges != null && priceRanges.contains('0-100')}" onchange="this.form.submit()">
+                            <label class="custom-control-label" for="price-1">₽0 - ₽100</label>
+                            <span class="badge border font-weight-normal" th:text="${priceCounts['0-100']}"></span>
+                        </div>
+                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            <input type="checkbox" class="custom-control-input" id="price-2" name="priceRanges" value="100-200"
+                                   th:checked="${priceRanges != null && priceRanges.contains('100-200')}" onchange="this.form.submit()">
+                            <label class="custom-control-label" for="price-2">₽100 - ₽200</label>
+                            <span class="badge border font-weight-normal" th:text="${priceCounts['100-200']}"></span>
+                        </div>
+                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            <input type="checkbox" class="custom-control-input" id="price-3" name="priceRanges" value="200-500"
+                                   th:checked="${priceRanges != null && priceRanges.contains('200-500')}" onchange="this.form.submit()">
+                            <label class="custom-control-label" for="price-3">₽200 - ₽500</label>
+                            <span class="badge border font-weight-normal" th:text="${priceCounts['200-500']}"></span>
+                        </div>
+                        <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            <input type="checkbox" class="custom-control-input" id="price-4" name="priceRanges" value="500_plus"
+                                   th:checked="${priceRanges != null && priceRanges.contains('500_plus')}" onchange="this.form.submit()">
+                            <label class="custom-control-label" for="price-4">₽500 и выше</label>
+                            <span class="badge border font-weight-normal" th:text="${priceCounts['500_plus']}"></span>
+                        </div>
+
+                        <div th:each="cid : ${selectedCategoryIds}">
+                            <input type="hidden" name="categoryIds" th:value="${cid}">
+                        </div>
+                        <div th:each="sid : ${selectedSubCategoryIds}">
+                            <input type="hidden" name="subCategoryIds" th:value="${sid}">
+                        </div>
+                    </form>
+                </div>
+                <!-- Price End -->
+
+                <!-- Category Start -->
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Категория</span></h5>
+                <div class="bg-light p-4 mb-30">
+                    <form method="get" action="/shop" id="categoryForm">
+                        <div th:each="category : ${categories}" class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            <input type="checkbox" class="custom-control-input"
+                                   th:checked="${selectedCategoryIds != null ? selectedCategoryIds.contains(category.cid) : false}"
+                                   th:id="'category-' + ${category.cid}"
+                                   name="categoryIds"
+                                   th:value="${category.cid}" onchange="this.form.submit()">
+                            <label class="custom-control-label" th:for="'category-' + ${category.cid}" th:text="${category.cname}">Category Name</label>
+                            <span class="badge border font-weight-normal" th:text="${categoryCounts[category.cid]}"></span>
+                        </div>
+                        <!-- Keep selected price ranges and subcategories in form submission -->
+                        <div th:each="price : ${priceRanges}">
+                            <input type="hidden" name="priceRanges" th:value="${price}">
+                        </div>
+                        <div th:each="sid : ${selectedSubCategoryIds}">
+                            <input type="hidden" name="subCategoryIds" th:value="${sid}">
+                        </div>
+                    </form>
+                </div>
+                <!-- Category End -->
+
+                <!-- Subcategory Start -->
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Подкатегория</span></h5>
+                <div class="bg-light p-4 mb-30">
+                    <form method="get" action="/shop" id="subCategoryForm">
+                        <input type="hidden" th:each="cid : ${selectedCategoryIds}" name="categoryIds" th:value="${cid}">
+                        <div th:each="subCategory : ${subCategories}" class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                            <input type="checkbox" class="custom-control-input"
+                                   th:checked="${selectedSubCategoryIds != null ? selectedSubCategoryIds.contains(subCategory.subId) : false}"
+                                   th:id="'subCategory-' + ${subCategory.subId}"
+                                   name="subCategoryIds"
+                                   th:value="${subCategory.subId}" onchange="this.form.submit()">
+                            <label class="custom-control-label" th:for="'subCategory-' + ${subCategory.subId}" th:text="${subCategory.subName}">SubCategory Name</label>
+                            <span class="badge border font-weight-normal" th:text="${subCategoryCounts[subCategory.subId]}"></span>
+                        </div>
+                        <!-- Keep selected price ranges and categories in form submission -->
+                        <div th:each="price : ${priceRanges}">
+                            <input type="hidden" name="priceRanges" th:value="${price}">
+                        </div>
+                    </form>
+                </div>
+                <!-- Subcategory End -->
+            </div>
+            <!-- Shop Sidebar End -->
+
+            <!-- Shop Product Start -->
+            <div class="col-lg-9 col-md-8">
+                <div class="row pb-3">
+                    <!-- Product -->
+                    <div class="col-lg-4 col-md-6 col-sm-6 pb-1" th:each="product : ${products}">
+                        <div class="product-item bg-light mb-4">
+                            <div class="product-img position-relative overflow-hidden">
+                                <img class="img-fluid w-100" th:src="@{'/image/' + ${product.imgPath}}" alt="">
+                                <div class="product-action">
+                                    <a class="btn btn-outline-dark btn-square" th:href="@{'/shop/cart'}"><i class="fa fa-shopping-cart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" th:href="@{'/shop/favorites'}"><i class="far fa-heart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" th:href="@{'/detail/'+ ${product.pid}}"><i class="fa fa-search"></i></a>
+                                </div>
+                            </div>
+                            <div class="text-center py-4">
+                                <a class="h6 text-decoration-none text-center" th:text="${product.pname}" href=""></a>
+                                <div class="d-flex align-items-center justify-content-center mt-2">
+                                    <h5><span th:text="'Цена: ' + ${product.price} + '₽'"></span></h5>
+                                    <h6 class="text-muted ml-2"><del></del></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product end -->
+                </div>
+            </div>
+            <!-- Shop Product End -->
+        </div>
+    </div>
+    <!-- Shop End -->
+    <!-- Modal -->
+    <div th:if="${session.favPlaced != null}" class="modal fade show" id="favConfirmationModal"
+         tabindex="-1" role="dialog" aria-labelledby="favConfirmationModalLabel" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="favConfirmationModalLabel">Внимание!</h5>
+                </div>
+                <div class="modal-body">
+                    Чтобы добавить данный товар в избранное или посмотреть свой список избранного,
+                    нужно войти в свой аккаунт или создать новый!
+                </div>
+                <div class="modal-footer">
+                    <form method="post" th:action="@{/shop/clearPlacedFlag}">
+                        <button type="submit" class="btn btn-primary">Закрыть</button>
+                    </form>
+                    <form method="get" th:action="@{/login}">
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${session.favPlaced != null}" class="modal-backdrop fade show"></div>
+    <!-- Modal end -->
+    <!-- Modal -->
+    <div th:if="${session.cartPlaced != null}" class="modal fade show" id="cartConfirmationModal"
+         tabindex="-1" role="dialog" aria-labelledby="cartConfirmationModalLabel"
+         aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartConfirmationModalLabel">Внимание!</h5>
+                </div>
+                <div class="modal-body">
+                    Чтобы добавить данный товар в корзину или посмотреть свою корзину,
+                    нужно войти в свой аккаунт или создать новый!
+                </div>
+                <div class="modal-footer">
+                    <form method="post" th:action="@{/shop/clearPlacedFlag}">
+                        <button type="submit" class="btn btn-primary">Закрыть</button>
+                    </form>
+                    <form method="get" th:action="@{/login}">
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${session.cartPlaced != null}" class="modal-backdrop fade show"></div>
+    <!-- Modal end -->
+</section>
+</body>
+</html>

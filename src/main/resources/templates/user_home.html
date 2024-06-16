@@ -220,9 +220,25 @@
 			</div>
 		</div>
 		<!-- Products End -->
+		<!-- Modal -->
+		<div th:if="${session.orderPlaced != null}" class="modal fade show" id="orderConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="orderConfirmationModalLabel" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.5);">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="orderConfirmationModalLabel">Заказ оформлен</h5>
+					</div>
+					<div class="modal-body">
+						Ваш заказ успешно оформлен!
+					</div>
+					<div class="modal-footer">
+						<form method="post" th:action="@{/USER/home/clearOrderPlacedFlag}">
+							<button type="submit" class="btn btn-primary">Закрыть</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div th:if="${session.orderPlaced != null}" class="modal-backdrop fade show"></div>
 	</section>
-
-
-
-
+</body>
 </html>

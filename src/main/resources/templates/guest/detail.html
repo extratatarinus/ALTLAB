@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" th:replace="~{user_base::layout(~{::section})}">
+<html lang="en" th:replace="~{base::layout(~{::section})}">
 
 <head>
 </head>
@@ -11,8 +11,8 @@
         <div class="row px-xl-5">
             <div class="col-12">
                 <nav class="breadcrumb bg-light mb-30">
-                    <a class="breadcrumb-item text-dark" th:href="@{/USER/home} ">Главная</a>
-                    <a class="breadcrumb-item text-dark" th:href="@{/USER/shop} ">Магазин</a>
+                    <a class="breadcrumb-item text-dark" th:href="@{/home} ">Главная</a>
+                    <a class="breadcrumb-item text-dark" th:href="@{/shop} ">Магазин</a>
                     <span class="breadcrumb-item active">Карточка товара</span>
                 </nav>
             </div>
@@ -48,17 +48,6 @@
                     <div class="d-flex mb-4">
                         <strong class="text-dark mr-3">Подкатегория:</strong>
                         <p th:text="${subCategory.subName}"></p>
-                    </div>
-                    <div class="d-flex align-items-center mb-4 pt-2">
-                        <form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.containsProduct(product)}">
-                            <input type="hidden" name="returnUrl" th:value="${currentUrl}">
-                            <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Добавить в корзину</button>
-                        </form>
-                        <form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.containsProduct(product)}">
-                            <input type="hidden" name="returnUrl" th:value="${currentUrl}">
-                            <button class="btn btn-primary px-3" style="background-color: #dfdfd9;"><i class="fa fa-shopping-cart mr-1"></i>Убрать из корзины</button>
-                        </form>
-
                     </div>
                     <div class="d-flex pt-2">
                         <strong class="text-dark mr-2">Поделиться:</strong>
@@ -109,30 +98,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <h4 class="mb-4">Оставить отзыв</h4>
-                                    <small>Ваш email не будет опубликован.</small>
-                                    <div class="d-flex my-3">
-                                        <p class="mb-0 mr-2">Ваша оценка:</p>
-                                    </div>
-                                    <form th:action="@{'/USER/detail/' + ${product.pid} + '/addReview'}" method="post">
-                                        <div class="form-group">
-                                            <label for="message">Ваш отзыв</label>
-                                            <textarea id="message" name="text" cols="30" rows="5" class="form-control"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="name">Ваше имя</label>
-                                            <input type="text" class="form-control" id="name" th:value="${currentUser.name}" readonly>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="email">Ваш email</label>
-                                            <input type="email" class="form-control" id="email" th:value="${currentUser.email}" readonly>
-                                        </div>
-                                        <div class="form-group mb-0">
-                                            <input type="submit" value="Оставить отзыв" class="btn btn-primary px-3">
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -153,27 +118,9 @@
                             <div class="product-img position-relative overflow-hidden">
                                 <img class="img-fluid w-100" th:src="@{'/image/' + ${product.imgPath}}" alt="">
                                 <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href="">
-                                        <form th:action="@{/USER/cart/add/{productId}(productId=${product.pid})}" method="post" th:if="${cartList == null or !cartList.containsProduct(product)}">
-                                            <input type="hidden" name="returnUrl" th:value="${currentUrl}">
-                                            <button type="submit" class="btn btn-outline-dark btn-square"><i class="fa fa-shopping-cart"></i></button>
-                                        </form>
-                                        <form th:action="@{/USER/cart/remove/{productId}(productId=${product.pid})}" method="post" th:if="${cartList != null and cartList.containsProduct(product)}">
-                                            <input type="hidden" name="returnUrl" th:value="${currentUrl}">
-                                            <button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="fa fa-shopping-cart"></i></button>
-                                        </form>
-                                    </a>
-                                    <a class="btn btn-outline-dark btn-square" href="">
-                                        <form th:action="@{/USER/favorites/add/{productId}(productId=${product.pid})}" method="post" th:if="${favoriteList == null or !favoriteList.contains(product)}">
-                                            <input type="hidden" name="returnUrl" th:value="${currentUrl}">
-                                            <button type="submit" class="btn btn-outline-dark btn-square"><i class="far fa-heart"></i></button>
-                                        </form>
-                                        <form th:action="@{/USER/favorites/remove/{productId}(productId=${product.pid})}" method="post" th:if="${favoriteList != null and favoriteList.contains(product)}">
-                                            <input type="hidden" name="returnUrl" th:value="${currentUrl}">
-                                            <button type="submit" class="btn btn-outline-dark btn-square" style="background-color: #f4cf2c;"><i class="far fa-heart"></i></button>
-                                        </form>
-                                    </a>
-                                    <a class="btn btn-outline-dark btn-square" th:href="@{'/USER/detail/'+ ${product.pid}}"><i class="fa fa-search"></i></a>
+                                    <a class="btn btn-outline-dark btn-square"><i class="fa fa-shopping-cart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square"><i class="far fa-heart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" th:href="@{'/detail/'+ ${product.pid}}"><i class="fa fa-search"></i></a>
                                 </div>
                             </div>
                             <div class="text-center py-4">

@@ -26,7 +26,10 @@ public class adminService {
 
     private final CartRepository cartrepo;
 
-   /* private final OrderRepository orepo;*/
+    private final OrderRepository orepo;
+
+    private final OrderItemRepository oitemrepo;
+
     private final CartItemRepository cartitemrepo;
 
     private final PromocodeRepository pcrepo;
@@ -57,10 +60,12 @@ public class adminService {
                         brandRepository brepo,
                         reviewsRepository rrepo,
                         favoriteRepository frepo,
-                        CartItemRepository cartitemrepo/*,
-                        *//*OrderRepository orepo*/) {
+                        CartItemRepository cartitemrepo,
+                        OrderRepository orepo,
+                        OrderItemRepository oitemrepo) {
+        this.oitemrepo = oitemrepo;
         this.cartrepo = cartrepo;
-        /*this.orepo = orepo;*/
+        this.orepo = orepo;
         this.pcrepo = pcrepo;
         this.cartitemrepo = cartitemrepo;
         this.jms = jms;
@@ -541,5 +546,49 @@ public class adminService {
 
     public List<product> getProductsByCategory(String categoryId) {
         return prepo.findProductsByCategoryId(categoryId);
+    }
+
+    public Order placeOrder(int userId, String firstName, String lastName, String phone, String address,
+                            String city, String region, String zipCode, String paymentMethod,
+                            int totalSum, int shippingCost, double discountPercentage, double discountAmount,
+                            double finalTotal, List<OrderItem> items) {
+
+        User user = urepo.findById(userId).orElseThrow();
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setFirstName(firstName);
+        order.setLastName(lastName);
+        order.setPhone(phone);
+        order.setAddress(address);
+        order.setCity(city);
+        order.setRegion(region);
+        order.setZipCode(zipCode);
+        order.setPaymentMethod(paymentMethod);
+        order.setStatus("Pending");
+        order.setTotalSum(totalSum);
+        order.setShippingCost(shippingCost);
+        order.setDiscountPercentage(discountPercentage);
+        order.setDiscountAmount(discountAmount);
+        order.setFinalTotal(finalTotal);
+
+        order = orepo.save(order);
+
+        for (OrderItem item : items) {
+            item.setOrder(order);
+            oitemrepo.save(item);
+        }
+
+        return order;
+    }
+
+    @Transactional
+    public void clearCart(int userId) {
+        Cart cart = cartrepo.findByUserId(userId);
+        if (cart != null) {
+            cart.getItems().clear();
+            cart.setPromoCode(null);
+            cartrepo.save(cart);
+        }
     }
 }

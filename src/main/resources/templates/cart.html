@@ -63,6 +63,13 @@
                         </td>
                     </tr>
                     </tbody>
+                    <tbody th:if="${cartList == null or #lists.size(cartList.items) == 0}">
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            <h5>Ваша корзина пуста</h5>
+                        </td>
+                    </tr>
+                    </tbody>
                 </table>
                 </table>
             </div>
@@ -71,7 +78,8 @@
                     <div class="input-group">
                         <input type="text" name="promoCode" class="form-control border-0 p-4" placeholder="Промокод">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">Подтвердить</button>
+                            <button class="btn btn-primary" type="submit"
+                                    th:disabled="${cartList == null or #lists.size(cartList.items) == 0}">Подтвердить</button>
                         </div>
                     </div>
                 </form>
@@ -98,7 +106,8 @@
                         </div>
                         <form th:action="@{/USER/checkout}" method="get">
                             <input type="hidden" name="promoCode" th:value="${promoCode}" />
-                            <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Заказать</button>
+                            <button class="btn btn-block btn-primary font-weight-bold my-3 py-3"
+                                    th:disabled="${cartList == null or #lists.size(cartList.items) == 0}">Заказать</button>
                         </form>
                     </div>
                     <small class="text-center">При покупке от 1000 рублей доставка бесплатная (учитывается стоимость товаров)</small>
