@@ -1,61 +1,124 @@
+<!DOCTYPE html>
 <html th:replace="admin/admin_base::layout(~{::section})">
-
 <head>
-
+	<title>Добавить категорию</title>
 </head>
-
 <body>
-	<section>
-		<div class="col-sm-12 col-xl-12 mt-4">
-			<div class="bg-light rounded h-80 p-4">
-
-				<div class="col-sm-12 col-xl-6">
-					<div class="bg-light rounded h-20 p-1">
-						<h6 class="mb-2">Add Category</h6>
-						<form th:action="@{/ADMIN/add_category}" method="post" enctype="multipart/form-data">
-							<div class="mb-3">
-
-								<input type="text" class="form-control" id="exampleInputEmail1"
-									aria-describedby="emailHelp" name="cname">
-							</div>
-							<div class="mb-3">
-								<label for="exampleInputPassword1" class="form-label">Image</label>
-								<input type="file" class="form-control" id="exampleInputPassword1" name="image">
-							</div>
-							<button type="submit" class="btn btn-primary">Add</button>
-						</form>
-					</div>
+<section>
+	<div class="col-sm-12 col-xl-12 mt-4">
+		<div class="bg-light rounded h-80 p-4">
+			<div class="col-sm-12 col-xl-6">
+				<div class="bg-light rounded h-20 p-1">
+					<h6 class="mb-2">Добавить категорию</h6>
+					<form id="addCategoryForm" th:action="@{/ADMIN/add_category}" method="post" enctype="multipart/form-data">
+						<div class="mb-3">
+							<input type="text" class="form-control" id="categoryName" aria-describedby="emailHelp" name="cname">
+						</div>
+						<div class="mb-3">
+							<label for="categoryImage" class="form-label">Картинка</label>
+							<input type="file" class="form-control" id="categoryImage" name="image">
+						</div>
+						<button type="submit" class="btn btn-primary">Добавить</button>
+					</form>
 				</div>
-				<h6 class="mb-4">Categories</h6>
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th scope="col">#</th>
-							<th scope="col">Category id</th>
-							<th scope="col">Category Name</th>
-							<th scope="col">Sub Categories</th>
-							<th scope="col">Update</th>
-							<th scope="col">Delete</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="e:${categories}">
-							<td scope="col"> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;">
-							</td>
-							<td scope="row" th:text="${e.cid}"></td>
-							<td th:text="${e.cname}"></td>
-							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/sub_category/' +${e.cid}}">View</a> </td>
-							<td> <a class="btn btn-primary"
-									th:href="@{'/ADMIN/updateFormCategory/'+${e.cid}}">Update</a> </td>
-							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/deleteCategory/'+${e.cid}}">Delete</a>
-							</td>
-						</tr>
+			</div>
+			<h6 class="mb-4">Категории</h6>
+			<table class="table table-striped">
+				<thead>
+				<tr>
+					<th scope="col">Изображение</th>
+					<th scope="col">Название категории</th>
+					<th scope="col">Подкатегории</th>
+					<th scope="col">Изменить</th>
+					<th scope="col">Удалить</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr th:each="e:${categories}">
+					<td scope="col"> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;"></td>
+					<td th:text="${e.cname}"></td>
+					<td> <a class="btn btn-primary" th:href="@{'/ADMIN/sub_category/' +${e.cid}}">Обзор</a> </td>
+					<td> <a class="btn btn-primary" th:href="@{'/ADMIN/updateFormCategory/'+${e.cid}}">Изменить</a> </td>
+					<td> <a class="btn btn-danger" th:href="@{'/ADMIN/deleteCategory/'+${e.cid}}">Удалить</a> </td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
-					</tbody>
-				</table>
+	<!-- Модальное окно для ошибок валидации -->
+	<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="validationModalLabel">Ошибка валидации</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="validationModalBody">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+				</div>
 			</div>
 		</div>
-	</section>
-</body>
+	</div>
 
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		console.log("Document is ready");
+
+		function validateField(field, regex, errorMessage) {
+			var value = field.value.trim();
+			console.log("Validating field:", field.id, "with value:", value);
+			if (!value || (regex && !regex.test(value))) {
+				console.log("Validation error for field:", field.id, "with value:", value);
+				return errorMessage;
+			}
+			return null;
+		}
+
+		function validateForm(formId) {
+			var errors = [];
+
+			if (formId === 'addCategoryForm') {
+				errors.push(validateField(document.getElementById('categoryName'), /^[a-zA-Zа-яА-Я0-9\s]+$/, "Название обязательно и может содержать только буквы, цифры и пробелы"));
+				errors.push(validateField(document.getElementById('categoryImage'), /.+/, "Изображение обязательно"));
+			}
+
+			errors = errors.filter(function (error) {
+				return error != null;
+			});
+
+			if (errors.length > 0) {
+				var modalBody = document.getElementById('validationModalBody');
+				modalBody.innerHTML = '';
+				errors.forEach(function (error) {
+					var errorElement = document.createElement('p');
+					errorElement.textContent = error;
+					modalBody.appendChild(errorElement);
+				});
+				var validationModal = new bootstrap.Modal(document.getElementById('validationModal'));
+				validationModal.show();
+				console.log("Form validation failed with errors: ", errors);
+				return false;
+			}
+			console.log("Form validation passed");
+			return true;
+		}
+
+		var form = document.getElementById('addCategoryForm');
+		form.addEventListener('submit', function (event) {
+			console.log("Submitting form: ", form.id);
+			if (!validateForm(form.id)) {
+				event.preventDefault();
+				console.log("Form submission prevented");
+			} else {
+				console.log("Form submitted successfully");
+			}
+		});
+	});
+
+</script>
+</section>
+</body>
 </html>

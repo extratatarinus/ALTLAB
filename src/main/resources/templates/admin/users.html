@@ -15,32 +15,29 @@
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th scope="col">#</th>
-							<th scope="col">ID</th>
-							<th scope="col">Name</th>
-							<th scope="col">Address</th>
-							<th scope="col">Email</th>
-							<th scope="col">Phone</th>
-							<th scope="col">Status</th>
-							<th scope="col">Update</th>
-							<th scope="col">Delete</th>
+							<th scope="col">Изображение</th>
+							<th scope="col">Имя</th>
+							<th scope="col">Адрес</th>
+							<th scope="col">Почта</th>
+							<th scope="col">Телефон</th>
+							<th scope="col">Статус</th>
+							<th scope="col"></th>
+							<th scope="col"></th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:each="e:${users}" >
 							<td scope="col"> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;">
 							</td>
-							<td scope="row" th:text="${e.id}"></td>
 							<td th:text="${e.name}"></td>
 							<td th:text="${e.address}"> </td>
 							<td th:text="${e.email}"></td>
 							<td th:text="${e.phone}"></td>
 							<td th:text="${e.status}"></td>
-							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/userUpdateForm/'+${e.id}}">Update</a>
+							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/userUpdateForm/'+${e.id}}">Изменить</a>
 							</td>
-							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/userDelete/'+${e.id}}">Delete</a> </td>
+							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/userDelete/'+${e.id}}">Удалить</a> </td>
 						</tr>
-
 					</tbody>
 				</table>
 			</div>

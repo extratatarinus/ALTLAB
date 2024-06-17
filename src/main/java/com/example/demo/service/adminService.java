@@ -175,20 +175,9 @@ public class adminService {
         return c.getSubCategory();
     }
 
-    public void add_subCategory(String subName, int cid, MultipartFile file) throws IllegalStateException, IOException {
+    public void add_subCategory(String subName, int cid) throws IllegalStateException, IOException {
         subCategory s = new subCategory();
         category c = crepo.findById(cid).get();
-
-        if (file.isEmpty()) {
-            s.setImgPath("");
-        } else {
-            String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
-            String npath = folderPath + file.getOriginalFilename();
-            String search = "image\\";
-            int i = npath.indexOf(search);
-            file.transferTo(new File(npath));
-            s.setImgPath(npath.substring(i + search.length()));
-        }
 
         if (subCategories(cid).isEmpty()) {
             String new_name = c.getCname().replace(" ", "");
@@ -212,17 +201,8 @@ public class adminService {
     }
 
     @Transactional
-    public void updateSubCat(String sname, String id, MultipartFile file) throws IllegalStateException, IOException {
-        if (file.isEmpty()) {
-            srepo.updateSubCategory(sname, "", id);
-        } else {
-            String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
-            String npath = folderPath + file.getOriginalFilename();
-            String search = "image\\";
-            int i = npath.indexOf(search);
-            file.transferTo(new File(npath));
-            srepo.updateSubCategory(sname, (String) npath.substring(i + search.length()), id);
-        }
+    public void updateSubCat(String sname, String id) throws IllegalStateException, IOException {
+        srepo.updateSubCategory(sname, id);
     }
 
     public int findCatFromSubCat(String sid) {
@@ -252,16 +232,22 @@ public class adminService {
     }
 
     @Transactional
-    public void updateProduct(String pname, String price, String description, MultipartFile file, Long pid) throws IllegalStateException, IOException {
+    public void updateProduct(String pname,
+                              String Information,
+                              String shortDescription,
+                              String price,
+                              String description,
+                              MultipartFile file,
+                              Long pid) throws IllegalStateException, IOException {
 
         String folderPath = "C:\\ALTLAB\\src\\main\\resources\\static\\image\\";
         String npath = folderPath + file.getOriginalFilename();
         String search = "image\\";
         int i = npath.indexOf(search);
         if (file.isEmpty()) {
-            prepo.updateProduct(pname, price, description, findProductById(pid).getImgPath(), pid);
+            prepo.updateProduct(pname, Information, shortDescription, price, description, findProductById(pid).getImgPath(), pid);
         } else {
-            prepo.updateProduct(pname, price, description, npath.substring(i + search.length()), pid);
+            prepo.updateProduct(pname, Information, shortDescription, price, description, npath.substring(i + search.length()), pid);
             file.transferTo(new File(npath));
         }
     }

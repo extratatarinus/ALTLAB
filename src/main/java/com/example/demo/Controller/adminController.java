@@ -1,6 +1,8 @@
 package com.example.demo.Controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.security.Principal;
 import java.util.List;
@@ -67,13 +69,15 @@ public class adminController {
 		model.addAttribute("user", session.getAttribute("user"));
 		List<com.example.demo.Entity.category> clist = aservice.getCategories();
 		model.addAttribute("clist", clist);
+		List<com.example.demo.Entity.category> list = aservice.getCategories();
+		model.addAttribute("categories", list);
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		return "admin/add_product_form";
 	}
 
 	@GetMapping("/subCategories")
 	@ResponseBody
-	public List<subCategory> getsubCat(@RequestParam("categoryId") int cid, Model model) {
+	public List<subCategory> getsubCat(@RequestParam("categoryId") int cid) {
 		return aservice.subCategories(cid);
 
 	}
@@ -84,6 +88,8 @@ public class adminController {
 			HttpServletResponse response) throws IllegalStateException, IOException {
 		aservice.add_product(p, file, subCategory);
 		model.addAttribute("rcount", session.getAttribute("rcount"));
+		List<com.example.demo.Entity.category> list = aservice.getCategories();
+		model.addAttribute("categories", list);
 		response.sendRedirect("/ADMIN/add_product_form");
 	}
 
@@ -137,10 +143,10 @@ public class adminController {
 
 	@PostMapping("/add_subCategory")
 	public void add_subCategory(Model model, HttpSession session, HttpServletResponse response,
-			@RequestParam("cname") String subName, @RequestParam("image") MultipartFile file) throws IOException {
+			@RequestParam("cname") String subName) throws IOException {
 		if (aservice.findSubCategoryBySubName(subName) == null) {
 			int cid = (int) session.getAttribute("cid");
-			aservice.add_subCategory(subName, cid, file);
+			aservice.add_subCategory(subName, cid);
 			model.addAttribute("rcount", session.getAttribute("rcount"));
 			response.sendRedirect("/ADMIN/sub_category/" + cid);
 
@@ -154,7 +160,9 @@ public class adminController {
 	public String viewSubCategory(@PathVariable("id") String id, Model model, HttpSession session) {
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("cat", aservice.findCategoryById(aservice.findCatFromSubCat(id)));
 		model.addAttribute("vsub", aservice.findSubCategory(id));
+		model.addAttribute("products", aservice.findProductFromSubCategory(id));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		return "admin/viewSubCategory";
 	}
@@ -170,17 +178,35 @@ public class adminController {
 	}
 
 	@PostMapping("/updateSub/{id}")
-	public void updateSub(@PathVariable("id") String id, @RequestParam("image") MultipartFile file,
+	public void updateSub(@PathVariable("id") String id,
 			@RequestParam("name") String sname, Model model, HttpSession session, HttpServletResponse response)
 			throws IllegalStateException, IOException {
 
-		aservice.updateSubCat(sname, id, file);
+		aservice.updateSubCat(sname, id);
 		int cid = aservice.findCatFromSubCat(id);
 		model.addAttribute("user", session.getAttribute("user"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
-		// model.addAttribute(", response)
 		response.sendRedirect("/ADMIN/sub_category/" + cid);
 
+	}
+
+	@PostMapping("/updateProduct/{id}")
+	public String editProduct(@PathVariable("id") Long id,
+							  @ModelAttribute("product") product product,
+							  @RequestParam("image") MultipartFile image) throws IOException {
+		aservice.updateProduct(product.getPname(), product.getInformation(), product.getShortDescription(),
+				product.getPrice(), product.getDescription(), image, id);
+		String sub = aservice.findSubCategoryByProductId(id).getSubId();
+		String encodedSub = URLEncoder.encode(sub, StandardCharsets.UTF_8.toString());
+		return "redirect:/ADMIN/viewSubCategory/" + encodedSub;
+	}
+
+	@RequestMapping("/delete_product/{id}")
+	public String delete_product(@PathVariable("id") Long id) throws IOException {
+		String sub = aservice.findSubCategoryByProductId(id).getSubId();
+		String encodedSub = URLEncoder.encode(sub, StandardCharsets.UTF_8.toString());
+		aservice.deleteProduct(id);
+		return "redirect:/ADMIN/viewSubCategory/" + encodedSub;
 	}
 
 	@GetMapping("deleteCategory/{id}")
@@ -198,8 +224,8 @@ public class adminController {
 		aservice.deleteSubById(id);
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		response.sendRedirect("/ADMIN/sub_category/" + cid);
-
 	}
+
 
 	@GetMapping("/request")
 	public String request(Model model, HttpSession session) {

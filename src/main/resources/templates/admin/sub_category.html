@@ -10,46 +10,32 @@
 			<div class="bg-light rounded h-80 p-4">
 				<div class="col-sm-12 col-xl-4">
 					<div class="bg-light rounded h-20 p-1">
-						<h6 class="mb-2">Add SubCategory</h6>
+						<h6 class="mb-2">Добавить подкатегорию</h6>
 						<form th:action="@{/ADMIN/add_subCategory}" method="post" enctype="multipart/form-data">
 							<div class="mb-3">
-								<label for="name">Name</label>
+								<label for="name">Название</label>
 								<input type="text" class="form-control" id="exampleInputEmail1"
 									aria-describedby="emailHelp" name="cname">
 							</div>
-							<div class="mb-3">
-								<label for="image">Image</label>
-								<input type="file" class="form-control" id="imgFile" aria-describedby="emailHelp"
-									name="image">
-
-							</div>
-
-							<button type="submit" class="btn btn-primary">Add</button>
+							<button type="submit" class="btn btn-primary">Добавить</button>
 						</form>
 					</div>
 				</div>
-				<h6 class="mb-4">Categories</h6>
+				<h6 class="mb-4">Подкатегории</h6>
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th scope="col"> Id</th>
-							<th scope="col">Name</th>
-							<th>Image</th>
-							<th>Brands</th>
-							<th>Update</th>
-							<th>Delete</th>
+							<th scope="col">Название</th>
+							<th>Изменить</th>
+							<th>Удалить</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:each="e:${subCategory}">
-							<th scope="row" th:text="${e.subId}"></th>
 							<td th:text="${e.subName}"></td>
-							<td> <img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;"> </td>
-							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/brands/' +${e.subId}}">Brands</a>
+							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/update_subCat/' +${e.subId}}">Изменить</a>
 							</td>
-							<td> <a class="btn btn-primary" th:href="@{'/ADMIN/update_subCat/' +${e.subId}}">Update</a>
-							</td>
-							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/delete_subCat/' +${e.subId}}">Delete</a>
+							<td> <a class="btn btn-danger" th:href="@{'/ADMIN/delete_subCat/' +${e.subId}}">Удалить</a>
 							</td>
 
 

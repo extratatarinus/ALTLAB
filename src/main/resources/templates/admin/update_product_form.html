@@ -5,35 +5,105 @@
 </head>
 
 <body>
-	<section>
-		<div class="col-sm-12 col-xl-8">
-			<div class="bg-light rounded h-80 p-4 mt-4">
-				<h6 class="mb-4">Update Product</h6>
-				<form th:action="@{'/ADMIN/updateProduct/' +${product.pid}}" method="post" enctype="multipart/form-data"
-					th:object="${sub}">
-					<div class="mb-3">
-						<label for="exampleInputEmail1" class="form-label">Name</label>
-						<input type="text" class="form-control" name="name" th:value="${product.pname}">
-					</div>
-					<div class="mb-3">
-						<label for="exampleInputEmail1" class="form-label">Price</label>
-						<input type="text" class="form-control" name="price" th:value="${product.price}">
-					</div>
-					<div class="mb-3">
-						<label for="exampleInputEmail1" class="form-label">Description</label>
-						<textarea class="form-control" th:text="${product.description}" id="floatingTextarea"
-							style="height: 150px;" name="description"></textarea>
-					</div>
-					<div class="mb-3">
-						<label for="exampleInputPassword1" class="form-label">Image</label>
-						<input type="file" class="form-control" id="exampleInputPassword1" name="image">
-					</div>
+<section>
+	<div class="col-sm-12 col-xl-8">
+		<div class="bg-light rounded h-80 p-4 mt-4">
+			<h6 class="mb-4">Update Product</h6>
+			<form id="updateProductForm" th:action="@{'/ADMIN/updateProduct/' + ${product.pid}}" method="post" enctype="multipart/form-data">
+				<div class="mb-3">
+					<label for="exampleInputEmail1" class="form-label">Название товара</label>
+					<input type="text" th:value="${product.pname}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname">
+				</div>
+				<div class="mb-3">
+					<label for="exampleInputPassword1" class="form-label">Цена</label>
+					<input type="text" th:value="${product.price}" class="form-control" id="exampleInputPassword1" name="price">
+				</div>
+				<label for="exampleInputPassword1" class="form-label">Краткое описание</label>
+				<div class="form-floating mb-4">
+					<textarea class="form-control" th:text="${product.shortDescription}" placeholder="Leave a comment here" id="floatingTextarea1" style="height: 150px;" name="shortDescription"></textarea>
+					<label for="floatingTextarea1">Краткое описание товара</label>
+				</div>
+				<label for="exampleInputPassword1" class="form-label">Описание</label>
+				<div class="form-floating mb-4">
+					<textarea class="form-control" th:text="${product.description}" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 150px;" name="description"></textarea>
+					<label for="floatingTextarea2">Подробное описание товара</label>
+				</div>
+				<label for="exampleInputPassword1" class="form-label">Дополнительная информация</label>
+				<div class="form-floating mb-4">
+					<textarea class="form-control" th:text="${product.information}" placeholder="Leave a comment here" id="floatingTextarea3" style="height: 150px;" name="Information"></textarea>
+					<label for="floatingTextarea3">Дополнительная информация(например: размер, ширина, материал)</label>
+				</div>
+				<div class="mb-3">
+					<label for="formFileLg" class="form-label">Загрузите картинку</label>
+					<input class="form-control form-control-lg" id="formFileLg" type="file" name="image">
+				</div>
+				<button type="submit" class="btn btn-primary">Обновить</button>
+			</form>
+		</div>
+	</div>
 
-					<button type="submit" class="btn btn-primary">Update</button>
-				</form>
+	<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="validationModalLabel">Неправильно введены данные!</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="validationModalBody">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+				</div>
 			</div>
 		</div>
-	</section>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			function validateField(field, regex, errorMessage) {
+				var value = field.value.trim();
+				if (!value || (regex && !regex.test(value))) {
+					return errorMessage;
+				}
+				return null;
+			}
+
+			function validateForm() {
+				var errors = [];
+
+				errors.push(validateField(document.getElementById('exampleInputEmail1'), /^[a-zA-Zа-яА-Я0-9\s]+$/, "Название обязательно и может содержать только буквы, цифры и пробелы"));
+				errors.push(validateField(document.getElementById('exampleInputPassword1'), /^[0-9]+$/, "Цена обязательна и может содержать только цифры"));
+				errors.push(validateField(document.getElementById('floatingTextarea1'), /.+/, "Краткое описание обязательно"));
+				errors.push(validateField(document.getElementById('floatingTextarea2'), /.+/, "Описание обязательно"));
+				errors.push(validateField(document.getElementById('floatingTextarea3'), /.+/, "Дополнительная информация обязательна"));
+
+				errors = errors.filter(function (error) {
+					return error != null;
+				});
+
+				if (errors.length > 0) {
+					var modalBody = document.getElementById('validationModalBody');
+					modalBody.innerHTML = '';
+					errors.forEach(function (error) {
+						var errorElement = document.createElement('p');
+						errorElement.textContent = error;
+						modalBody.appendChild(errorElement);
+					});
+					var validationModal = new bootstrap.Modal(document.getElementById('validationModal'));
+					validationModal.show();
+					return false;
+				}
+				return true;
+			}
+
+			document.getElementById('updateProductForm').addEventListener('submit', function (event) {
+				if (!validateForm()) {
+					event.preventDefault();
+				}
+			});
+		});
+	</script>
+</section>
 </body>
 
 </html>

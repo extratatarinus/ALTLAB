@@ -14,7 +14,6 @@
 						<label for="exampleInputEmail1" class="form-label">Название товара</label>
 						<input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
 							name="pname">
-
 					</div>
 					<div class="mb-3">
 						<label for="exampleInputPassword1" class="form-label">Цена</label>
@@ -52,7 +51,7 @@
 					<label for="exampleInputPassword1" class="form-label">Дополнительная информация</label>
 					<div class="form-floating mb-4">
 						<textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea3"
-								  style="height: 150px;" name="description"></textarea>
+								  style="height: 150px;" name="Information"></textarea>
 						<label for="floatingTextarea3">Дополнительная информация(например: размер, ширина, материал)</label>
 					</div>
 					<div class="mb-3">
@@ -64,39 +63,94 @@
 			</div>
 		</div>
 
+		<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="validationModalLabel">Неправильно введены данные!</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body" id="validationModalBody">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<script>
 			$(document).ready(function () {
-				// Event handler for category change
+				function validateField(field, regex, errorMessage) {
+					var value = field.val().trim();
+					console.log("Validating field:", field.attr('id'), "with value:", value);
+					if (!value || (regex && !regex.test(value))) {
+						console.log("Validation error for field:", field.attr('id'), "with value:", value);
+						return errorMessage;
+					}
+					return null;
+				}
+
+				function validateForm() {
+					var errors = [];
+
+					errors.push(validateField($('#exampleInputEmail1'), /^[a-zA-Zа-яА-Я0-9\s]+$/, "Название обязательно и может содержать только буквы, цифры и пробелы"));
+					errors.push(validateField($('#exampleInputPassword1'), /^[0-9]+$/, "Цена обязательна и может содержать только цифры"));
+					errors.push(validateField($('#category'), /.+/, "Категория обязательна"));
+					errors.push(validateField($('#subCategory'), /.+/, "Подкатегория обязательна"));
+					errors.push(validateField($('#floatingTextarea1'), /.+/, "Краткое описание обязательно"));
+					errors.push(validateField($('#floatingTextarea2'), /.+/, "Описание обязательно"));
+					errors.push(validateField($('#floatingTextarea3'), /.+/, "Дополнительная информация обязательна"));
+					errors.push(validateField($('#formFileLg'), /.+/, "Изображение обязательно"));
+
+					errors = errors.filter(function (error) {
+						return error != null;
+					});
+
+					if (errors.length > 0) {
+						var modalBody = $('#validationModalBody');
+						modalBody.empty();
+						errors.forEach(function (error) {
+							var errorElement = $('<p>').text(error);
+							modalBody.append(errorElement);
+						});
+						$('#validationModal').modal('show');
+						return false;
+					}
+					return true;
+				}
+
 				$('#category').change(function () {
-					var categoryId = $(this).val(); // Get the selected category ID
+					var categoryId = $(this).val();
 					if (categoryId) {
 						$.ajax({
-							url: '/ADMIN/subCategories', // URL for the AJAX request to fetch subcategories
-							data: {categoryId: categoryId}, // Query parameter to send to the server
+							url: '/ADMIN/subCategories',
+							data: { categoryId: categoryId },
 							success: function (data) {
 								var subcategorySelect = $('#subCategory');
-								subcategorySelect.empty(); // Clear the existing options
-								subcategorySelect.append($('<option>').val('').text('Select a subcategory'));
+								subcategorySelect.empty();
+								subcategorySelect.append($('<option>').val('').text('Выберите подкатегорию'));
 								data.forEach(function (sub) {
-									var option = $('<option>'); // Create a new <option>
-									option.val(sub.subId); // Set the value
-									option.text(sub.subName); // Set the displayed text
-									subcategorySelect.append(option); // Append the option to the dropdown
+									var option = $('<option>');
+									option.val(sub.subId);
+									option.text(sub.subName);
+									subcategorySelect.append(option);
 								});
 							}
 						});
 					} else {
-						$('#subCategory').empty().append($('<option>').val('').text('Select Subcategory'));
+						$('#subCategory').empty().append($('<option>').val('').text('Выберите подкатегорию'));
 					}
 				});
 
-				// Event handler for subcategory change
-				$('#subCategory').change(function () {
-					var subcategoryId = $(this).val(); // Get the selected subcategory ID
+				$('form').submit(function (event) {
+					if (!validateForm()) {
+						event.preventDefault();
+					}
 				});
 			});
-
 		</script>
+
 	</section>
 </body>
 

@@ -23,8 +23,8 @@ public interface sunCatRepository extends JpaRepository<subCategory, String> {
 	subCategory findSubCategoryById(@Param("subId") String subId);
 	
 	@Modifying
-	@Query("update subCategory s set s.subName= :sname, s.imgPath= :img where s.subId= :id")
-	void updateSubCategory(@Param("sname")String sname,@Param("img")String imgPath,@Param("id")String id);
+	@Query("update subCategory s set s.subName= :sname where s.subId= :id")
+	void updateSubCategory(@Param("sname")String sname,@Param("id")String id);
 	
 	subCategory findSubCategoryBySubName(String subName);
 	

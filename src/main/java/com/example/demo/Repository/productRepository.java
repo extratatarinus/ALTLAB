@@ -16,8 +16,16 @@ import com.example.demo.Entity.product;
 public interface productRepository extends JpaRepository<product, Long> {
 
     @Modifying
-    @Query("update product p set p.pname= :pname, p.price= :price , p.description= :description,p.imgPath= :imgPath where p.pid= :pid")
-    void updateProduct(@Param("pname") String pname, @Param("price") String price, @Param("description") String description,
+    @Query("update product p set p.pname= :pname, p.price= :price, " +
+            "p.Information= :Information, " +
+            "p.shortDescription = :shortDescription," +
+            " p.description= :description," +
+            "p.imgPath= :imgPath where p.pid= :pid")
+    void updateProduct(@Param("pname") String pname,
+                       @Param("Information") String Information,
+                       @Param("shortDescription") String shortDescription,
+                       @Param("price") String price,
+                       @Param("description") String description,
                        @Param("imgPath") String imgPath, @Param("pid") Long pid);
 
     @Query("select p from product p where p.subCategory.subId= :subID")
