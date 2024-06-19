@@ -108,13 +108,13 @@
                     </tbody>
                 </table>
                 <div th:if="${order.status == 'Pending'}">
-                    <form th:action="@{/ADMIN/order/update-status/{orderId}/{status}/{redirect}(orderId=${order.id}, status='Processing', redirect='Pending')}"
+                    <form th:action="@{/ADMIN/order/update-status/{orderId}/{status}/{redirect}(orderId=${order.id}, status='Processing', redirect='Home')}"
                           method="post">
                         <button type="submit" class="btn btn-primary">Изготовить</button>
                     </form>
                 </div>
                 <div th:if="${order.status == 'Processing'}">
-                    <form th:action="@{/ADMIN/order/update-status/{orderId}/{status}/{redirect}(orderId=${order.id}, status='Shipped', redirect='Processing')}"
+                    <form th:action="@{/ADMIN/order/update-status/{orderId}/{status}/{redirect}(orderId=${order.id}, status='Shipped', redirect='Home')}"
                           method="post">
                         <button type="submit" class="btn btn-primary">Доставить</button>
                     </form>

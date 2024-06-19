@@ -1,0 +1,55 @@
+<html th:replace="admin/admin_base::layout(~{::section})">
+<body>
+<section>
+
+    <div class="col-sm-12 col-xl-12 mt-4">
+        <div class="bg-light rounded h-80 p-4">
+            <h2>Сотрудники</h2>
+            <form class="d-none d-md-flex  col-xl-3">
+                <input class="form-control border-0" type="search" placeholder="Поиск" id="searchInput">
+            </form>
+            <a th:href="@{/ADMIN/add_admin_form?role=ADMIN}">
+                <button type="button" class="btn btn-primary " ><i class="fa fa-plus m-1"></i>Добавить сотрудника</button>
+            </a>
+            <h6 class="mb-4">Сотрудники</h6>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Фото</th>
+                    <th scope="col">Имя</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e:${admins}">
+                    <td scope="col"><img th:src="@{'/image/'+${e.imgPath}}" style="width: 60px; height: 45px;">
+                    </td>
+                    <td th:text="${e.name}"></td>
+                    <td><a class="btn btn-primary" th:href="@{|/ADMIN/chat/${e.id}/${user.id}|}">Написать</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#searchInput').keyup(function() {
+                var searchText = $(this).val().toLowerCase();
+
+                $('tbody tr').each(function() {
+                    var userText = $(this).text().toLowerCase();
+                    if (userText.indexOf(searchText) === -1) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+            });
+        });
+    </script>
+</section>
+</body>
+</html>

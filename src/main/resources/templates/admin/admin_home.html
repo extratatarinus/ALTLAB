@@ -4,7 +4,191 @@
 	</head>
 	<body>
 		<section>
-			<h2>Hello</h2>
+			<!-- Sale & Revenue Start -->
+			<div class="container-fluid pt-4 px-4">
+				<div class="row g-4">
+					<div class="col-sm-6 col-xl-3">
+						<div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+							<i class="fa fa-chart-line fa-3x text-primary"></i>
+							<div class="ms-3">
+								<p class="mb-2">За сегодня</p>
+								<h6 class="mb-0" th:text="${todaySale}+ ' ₽'"></h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6 col-xl-3">
+						<div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+							<i class="fa fa-chart-bar fa-3x text-primary"></i>
+							<div class="ms-3">
+								<p class="mb-2">За месяц</p>
+								<h6 class="mb-0" th:text="${monthSale}+ ' ₽'"></h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6 col-xl-3">
+						<div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+							<i class="fa fa-chart-area fa-3x text-primary"></i>
+							<div class="ms-3">
+								<p class="mb-2">За год</p>
+								<h6 class="mb-0" th:text="${yearSale} + ' ₽'"></h6>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6 col-xl-3">
+						<div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+							<i class="fa fa-chart-pie fa-3x text-primary"></i>
+							<div class="ms-3">
+								<p class="mb-2">Всего продаж</p>
+								<h6 class="mb-0" th:text="${totalSale}+ ' ₽'"></h6>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Sale & Revenue End -->
+
+
+			<!-- Sale & Revenue Start -->
+			<div class="container-fluid pt-4 px-4">
+				<div class="row g-4">
+					<div class="col-sm-12 col-xl-6">
+						<div class="bg-light text-center rounded p-4">
+							<div class="d-flex align-items-center justify-content-between mb-4">
+								<h6 class="mb-0">Заказы за месяц</h6>
+							</div>
+							<canvas id="sales1"></canvas>
+						</div>
+					</div>
+					<div class="col-sm-12 col-xl-6">
+						<div class="bg-light text-center rounded p-4">
+							<div class="d-flex align-items-center justify-content-between mb-4">
+								<h6 class="mb-0">Заказы за год</h6>
+							</div>
+							<canvas id="sales2"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Sale & Revenue End -->
+
+
+			<!-- Recent Sales Start -->
+			<div class="container-fluid pt-4 px-4">
+				<div class="bg-light text-center rounded p-4">
+					<div class="d-flex align-items-center justify-content-between mb-4">
+						<h6 class="mb-0">Новые заказы</h6>
+					</div>
+					<div class="table-responsive">
+						<table class="table text-start align-middle table-bordered table-hover mb-0">
+							<thead>
+							<tr class="text-dark">
+								<th scope="col">Дата</th>
+								<th scope="col">Клиент</th>
+								<th scope="col">Цена</th>
+								<th scope="col">Способ оплаты</th>
+								<th scope="col">Информация</th>
+							</tr>
+							</thead>
+							<tbody>
+							<tr th:each="order : ${pendingOrders}">
+								<td th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy')}" >01 Jan 2045</td>
+								<td th:text="${order.firstName + ' ' + order.lastName}">Jhon Doe</td>
+								<td th:text="${order.totalSum} + ' ₽'" >$123</td>
+								<td th:text="${order.paymentMethod}">Paid</td>
+								<td><a class="btn btn-sm btn-primary" th:href="@{'/ADMIN/orderh/' + ${order.id}}">Обзор</a></td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- Recent Sales End -->
+			<!-- Sale & Revenue End -->
+
+			<script th:inline="javascript">
+				/*<![CDATA[*/
+				var dailySales = /*[[${dailySales}]]*/ {};
+				var monthlySales = /*[[${monthlySales}]]*/ {};
+
+				console.log("Daily Sales:", dailySales);
+				console.log("Monthly Sales:", monthlySales);
+
+				function createSalesChart(data) {
+					const ctx = document.getElementById('sales1').getContext('2d');
+					const labels = Object.keys(data);
+					const values = Object.values(data);
+
+					new Chart(ctx, {
+						type: 'line',
+						data: {
+							labels: labels,
+							datasets: [{
+								label: 'Заказы за день',
+								data: values,
+								borderColor: 'rgb(75, 192, 192)',
+								tension: 0.1
+							}]
+						},
+						options: {
+							scales: {
+								x: {
+									title: {
+										display: true,
+										text: 'День'
+									}
+								},
+								y: {
+									title: {
+										display: true,
+										text: 'Цена'
+									}
+								}
+							}
+						}
+					});
+				}
+
+				function createRevenueChart(data) {
+					const ctx = document.getElementById('sales2').getContext('2d');
+					const labels = Object.keys(data);
+					const values = Object.values(data);
+
+					new Chart(ctx, {
+						type: 'line',
+						data: {
+							labels: labels,
+							datasets: [{
+								label: 'Заказы за месяц',
+								data: values,
+								borderColor: 'rgb(54, 162, 235)',
+								tension: 0.1
+							}]
+						},
+						options: {
+							scales: {
+								x: {
+									title: {
+										display: true,
+										text: 'Месяц'
+									}
+								},
+								y: {
+									title: {
+										display: true,
+										text: 'Цена'
+									}
+								}
+							}
+						}
+					});
+				}
+
+				document.addEventListener('DOMContentLoaded', function() {
+					createSalesChart(dailySales);
+					createRevenueChart(monthlySales);
+				});
+				/*]]>*/
+			</script>
 		</section>
 	</body>
 </html>

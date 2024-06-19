@@ -2,16 +2,20 @@ package com.example.demo.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.Year;
+import java.time.YearMonth;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.example.demo.Entity.*;
 import com.example.demo.Repository.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -48,6 +52,10 @@ public class adminService {
 
     private final sunCatRepository srepo;
 
+    private final MessageRepository mrepo;
+
+    private final ChatRoomRepository chatrepo;
+
 
     public adminService(CartRepository cartrepo,
                         PromocodeRepository pcrepo,
@@ -60,7 +68,10 @@ public class adminService {
                         favoriteRepository frepo,
                         CartItemRepository cartitemrepo,
                         OrderRepository orepo,
-                        OrderItemRepository oitemrepo) {
+                        OrderItemRepository oitemrepo,
+                        MessageRepository mrepo,
+                        ChatRoomRepository chatrepo) {
+        this.mrepo = mrepo;
         this.oitemrepo = oitemrepo;
         this.cartrepo = cartrepo;
         this.orepo = orepo;
@@ -73,6 +84,7 @@ public class adminService {
         this.srepo = srepo;
         this.rrepo = rrepo;
         this.frepo = frepo;
+        this.chatrepo = chatrepo;
     }
 
     public User findByEmail(String email) {
@@ -538,18 +550,79 @@ public class adminService {
         return orepo.findById(id).orElse(null);
     }
 
-
-    public void checkAndUpdateShippedOrders() {
-        List<Order> shippedOrders = getShippedOrders();
-        LocalDateTime now = LocalDateTime.now();
-        for (Order order : shippedOrders) {
-            if (order.getOrderDate().plusDays(14).isBefore(now)) {
-                updateOrderStatus(order.getId(), "Delivered");
-            }
-        }
-    }
-
     public Order getOrderById(Long orderId) {
         return orepo.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Invalid order Id:" + orderId));
     }
+
+    public List<User> findAllAdmins() {
+        return urepo.findByRole("ADMIN");
+    }
+
+    public Message saveMessage(Message message) {
+        return mrepo.save(message);
+    }
+
+    public List<Message> getUnreadMessages(User receiver) {
+        return mrepo.findByReceiver(receiver);
+    }
+
+    public Optional<ChatRoom> findChatById(Long id){
+        return chatrepo.findById(id);
+    }
+
+    public List<Message> findMessagesBySenderAndReceiver(User sender, User receiver) {
+        return mrepo.findBySenderAndReceiver(sender, receiver);
+    }
+
+    public Map<Integer, Double> getMonthlySales() {
+        List<Order> orders = orepo.findAll();
+        Map<Integer, Double> monthlySales = new HashMap<>();
+
+        for (Order order : orders) {
+            int month = order.getOrderDate().getMonthValue();
+            monthlySales.put(month, monthlySales.getOrDefault(month, 0.0) + order.getFinalTotal());
+        }
+        return monthlySales;
+    }
+
+    public Map<Integer, Double> getDailySalesForCurrentMonth() {
+        List<Order> orders = orepo.findAll();
+        Map<Integer, Double> dailySales = new HashMap<>();
+        LocalDate now = LocalDate.now();
+
+        for (Order order : orders) {
+            if (order.getOrderDate().getYear() == now.getYear() && order.getOrderDate().getMonth() == now.getMonth()) {
+                int day = order.getOrderDate().getDayOfMonth();
+                dailySales.put(day, dailySales.getOrDefault(day, 0.0) + order.getFinalTotal());
+            }
+        }
+        return dailySales;
+    }
+
+    public double getTodaySale() {
+        LocalDate today = LocalDate.now();
+        return orepo.sumTotalByOrderDate(today) != null ? orepo.sumTotalByOrderDate(today) : 0.0;
+    }
+
+    public double getMonthSale() {
+        YearMonth month = YearMonth.now();
+        return orepo.sumTotalByMonth(month.getYear(), month.getMonthValue()) != null ? orepo.sumTotalByMonth(month.getYear(), month.getMonthValue()) : 0.0;
+    }
+
+    public double getYearSale() {
+        int year = Year.now().getValue();
+        return orepo.sumTotalByYear(year) != null ? orepo.sumTotalByYear(year) : 0.0;
+    }
+
+    public double getTotalSale() {
+        return orepo.sumTotal() != null ? orepo.sumTotal() : 0.0;
+    }
+
+    public List<Order> getHomePendingOrders() {
+        Pageable pageable = PageRequest.of(0, 8);
+        return orepo.findTop8ByStatusPendingOrderByOrderDateAsc(pageable);
+    }
 }
+
+
+

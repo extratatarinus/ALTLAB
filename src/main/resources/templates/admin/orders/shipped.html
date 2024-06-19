@@ -14,7 +14,6 @@
                     <th>Имя клиента</th>
                     <th>Дата заказа</th>
                     <th>Дата доставки</th>
-                    <th>Дней до доставки</th>
                     <th>Информация</th>
                 </tr>
                 </thead>
@@ -23,7 +22,6 @@
                     <td th:text="${order.firstName + ' ' + order.lastName}">Customer Name</td>
                     <td th:text="${#temporals.format(order.orderDate, 'dd.MM.yyyy HH:mm')}">Order Date</td>
                     <td th:text="${#temporals.format(order.deliveryDate, 'dd.MM.yyyy HH:mm')}">Delivery Date</td>
-                    <td th:text="${order.daysToDeliver}">Days to Deliver</td>
                     <td>
                         <a th:href="@{/ADMIN/order/{orderId}(orderId=${order.id})}" class="btn btn-info">Обзор</a>
                     </td>

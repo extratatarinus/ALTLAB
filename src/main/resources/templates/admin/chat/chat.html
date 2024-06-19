@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="admin/admin_base::layout(~{::section})">
+<head>
+    <title>Chat Room</title>
+    <style>
+        .message { margin: 10px 0; }
+        .message-left { text-align: left; }
+        .message-right { text-align: right; }
+        .message img { width: 40px; height: 40px; border-radius: 50%; }
+        .message-content { display: inline-block; padding: 10px; border-radius: 10px; }
+        .message-left .message-content { background-color: #f1f1f1; }
+        .message-right .message-content { background-color: #007bff; color: #fff; }
+    </style>
+</head>
+<body>
+<section>
+    <div class="container">
+        <h2>Chat Room</h2>
+        <div id="messages" class="mb-3">
+            <div th:each="message : ${messages}">
+                <div th:if="${message.sender.id == sender.id}" class="message message-right">
+                    <img th:src="@{/images/{img}(img=${sender.imgPath})}" alt="User Image">
+                    <span th:text="${sender.name}"></span>
+                    <div class="message-content" th:text="${message.content}"></div>
+                    <div th:if="${message.filePath != null}">
+                        <a th:href="@{/uploads/{filePath}(filePath=${message.filePath})}" target="_blank">View File</a>
+                    </div>
+                </div>
+                <div th:if="${message.sender.id != sender.id}" class="message message-left">
+                    <img th:src="@{/images/{img}(img=${receiver.imgPath})}" alt="User Image">
+                    <span th:text="${receiver.name}"></span>
+                    <div class="message-content" th:text="${message.content}"></div>
+                    <div th:if="${message.filePath != null}">
+                        <a th:href="@{/uploads/{filePath}(filePath=${message.filePath})}" target="_blank">View File</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="input-group">
+            <input type="text" id="messageInput" class="form-control" placeholder="Enter your message"/>
+            <input type="file" id="fileInput" class="form-control-file"/>
+            <div class="input-group-append">
+                <button class="btn btn-primary" id="sendButton">Send</button>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var senderId = /*[[${sender.id}]]*/ 0;
+        var receiverId = /*[[${receiver.id}]]*/ 0;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var stompClient = null;
+
+            function connect() {
+                var socket = new SockJS('/chat-websocket');
+                stompClient = Stomp.over(socket);
+                stompClient.connect({}, function (frame) {
+                    console.log('Connected: ' + frame);
+                    stompClient.subscribe('/topic/messages', function (messageOutput) {
+                        showMessage(JSON.parse(messageOutput.body));
+                    });
+                });
+            }
+
+            function sendMessage() {
+                var messageContent = document.getElementById("messageInput").value;
+                var fileInput = document.getElementById("fileInput");
+                var file = fileInput.files[0];
+
+                if (messageContent || file) {
+                    var formData = new FormData();
+                    formData.append("content", messageContent);
+                    formData.append("senderId", senderId);
+                    formData.append("receiverId", receiverId);
+
+                    if (file) {
+                        formData.append("file", file);
+                    }
+
+                    fetch("/ADMIN/sendMessage", {
+                        method: "POST",
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Message sent successfully");
+                            document.getElementById("messageInput").value = '';
+                            document.getElementById("fileInput").value = '';
+                            showMessage(data);
+                        })
+                        .catch(error => {
+                            console.error("Error sending message", error);
+                        });
+                } else {
+                    console.log("No message content or file to send");
+                }
+            }
+
+            function showMessage(message) {
+                var messagesDiv = document.getElementById("messages");
+                var messageElement = document.createElement('div');
+                messageElement.className = message.sender.id == senderId ? 'message message-right' : 'message message-left';
+                messageElement.innerHTML = '<img src="/images/' + (message.sender.id == senderId ? /*[[${sender.imgPath}]]*/ "" : /*[[${receiver.imgPath}]]*/) + '" alt="User Image">' +
+                    '<span>' + (message.sender.id == senderId ? /*[[${sender.name}]]*/ "" : /*[[${receiver.name}]]*/) + '</span>' +
+                    '<div class="message-content">' + message.content + '</div>' +
+                    (message.filePath ? '<div><a href="/uploads/' + message.filePath + '" target="_blank">View File</a></div>' : '');
+                messagesDiv.appendChild(messageElement);
+            }
+
+            document.getElementById("sendButton").addEventListener("click", sendMessage);
+
+            connect();
+        });
+        /*]]>*/
+    </script>
+</section>
+</body>
+</html>

@@ -4,12 +4,19 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import java.util.*;
 
 import com.example.demo.Entity.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +32,7 @@ import com.example.demo.service.adminService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/ADMIN")
@@ -39,6 +47,18 @@ public class adminController {
 	@GetMapping("/home")
 	public String home(Model model, Principal principal, HttpSession session) {
 		String email = principal.getName();
+		Map<Integer, Double> monthlySales = aservice.getMonthlySales();
+		Map<Integer, Double> dailySalesForCurrentMonth = aservice.getDailySalesForCurrentMonth();
+
+		model.addAttribute("todaySale", aservice.getTodaySale());
+		model.addAttribute("monthSale", aservice.getMonthSale());
+		model.addAttribute("yearSale", aservice.getYearSale());
+		model.addAttribute("totalSale", aservice.getTotalSale());
+
+		model.addAttribute("pendingOrders", aservice.getHomePendingOrders());
+
+		model.addAttribute("monthlySales", monthlySales);
+		model.addAttribute("dailySales", dailySalesForCurrentMonth);
 		session.setAttribute("rcount", aservice.findByStatus("Unverified").size());
 		model.addAttribute("rcount", aservice.findByStatus("Unverified").size());
 		model.addAttribute("user", aservice.findByEmail(email));
@@ -375,7 +395,11 @@ public class adminController {
 
 		aservice.updateOrderStatus(orderId, status);
 
-		return "redirect:/ADMIN/order/" + redirect.toLowerCase();
+		if (redirect.toLowerCase().equals("home")) {
+			return "redirect:/ADMIN/" + redirect.toLowerCase();
+		} else {
+			return "redirect:/ADMIN/order/" + redirect.toLowerCase();
+		}
 	}
 
 	@GetMapping("/order/{orderId}")
@@ -386,5 +410,97 @@ public class adminController {
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		return "admin/orders/details";
+	}
+
+	@GetMapping("/orderh/{orderId}")
+	public String getOrderhDetails(@PathVariable Long orderId, Model model, HttpSession session) {
+		Order order = aservice.getOrderById(orderId);
+		model.addAttribute("order", order);
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/details";
+	}
+
+	private String saveFile(MultipartFile file) throws IOException {
+		String uploadDir = "C:\\ALTLAB\\src\\main\\resources\\static\\uploads\\";
+		String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+		Path filePath = Paths.get(uploadDir + fileName);
+		Files.createDirectories(filePath.getParent());
+		Files.write(filePath, file.getBytes());
+		return fileName;
+	}
+
+	@GetMapping("/chat/{senderId}/{receiverId}")
+	public String chat(@PathVariable int senderId, @PathVariable int receiverId, Model model, HttpSession session) {
+		User sender = aservice.findUserById(senderId);
+		User receiver = aservice.findUserById(receiverId);
+		List<Message> messages = aservice.findMessagesBySenderAndReceiver(sender, receiver);
+		model.addAttribute("sender", sender);
+		model.addAttribute("receiver", receiver);
+		model.addAttribute("messages", messages);
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/chat/chat";
+
+	}
+
+	@PostMapping("/sendMessage")
+	public String sendMessage(@RequestParam("content") String content,
+							  @RequestParam("senderId") Integer senderId,
+							  @RequestParam("receiverId") Integer receiverId,
+							  @RequestParam(value = "file", required = false) MultipartFile file) {
+		Optional<User> sender = Optional.ofNullable(aservice.findById(senderId));
+		Optional<User> receiver = Optional.ofNullable(aservice.findById(receiverId));
+
+		if (sender.isPresent() && receiver.isPresent()) {
+			Message message = new Message();
+			message.setContent(content);
+			message.setSender(sender.get());
+			message.setReceiver(receiver.get());
+			message.setTimestamp(LocalDateTime.now());
+
+			if (file != null && !file.isEmpty()) {
+				try {
+					String fileName = saveFile(file);
+					message.setFilePath(fileName);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			aservice.saveMessage(message);
+			return "redirect: ADMIN/chat/"+senderId+"/"+receiverId;
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+		}
+	}
+
+	@MessageMapping("/sendMessage")
+	@SendTo("/topic/messages")
+	public Message sendMessage(Message message) {
+		message.setTimestamp(LocalDateTime.now());
+		return aservice.saveMessage(message);
+	}
+
+	@GetMapping("/admin/users")
+	public String getAdminUsers(Model model, HttpSession session) {
+		List<User> admins = aservice.findAllAdmins();
+		model.addAttribute("admins", admins);
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/chat/addmin_users";
+	}
+
+	@GetMapping("/unreadMessages")
+	public String getUnreadMessages(@RequestParam int userId, Model model) {
+		Optional<User> user = Optional.ofNullable(aservice.findUserById(userId));
+		if (user.isPresent()) {
+			List<Message> unreadMessages = aservice.getUnreadMessages(user.get());
+			model.addAttribute("unreadMessages", unreadMessages);
+		}
+		return "unreadMessages";
 	}
 }
