@@ -510,4 +510,46 @@ public class adminService {
             cartrepo.save(cart);
         }
     }
+
+
+    public List<Order> getPendingOrders() {
+        return orepo.findByStatusOrderByOrderDateAsc("Pending");
+    }
+
+    public List<Order> getProcessingOrders() {
+        return orepo.findByStatusOrderByOrderDateAsc("Processing");
+    }
+
+    public List<Order> getShippedOrders() {
+        return orepo.findByStatusOrderByOrderDateAsc("Shipped");
+    }
+
+    public List<Order> getDeliveredOrders() {
+        return orepo.findByStatusOrderByOrderDateAsc("Delivered");
+    }
+
+    public void updateOrderStatus(Long orderId, String status) {
+        Order order = orepo.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Invalid order Id:" + orderId));
+        order.setStatus(status);
+        orepo.save(order);
+    }
+
+    public Order findOrderById(Long id) {
+        return orepo.findById(id).orElse(null);
+    }
+
+
+    public void checkAndUpdateShippedOrders() {
+        List<Order> shippedOrders = getShippedOrders();
+        LocalDateTime now = LocalDateTime.now();
+        for (Order order : shippedOrders) {
+            if (order.getOrderDate().plusDays(14).isBefore(now)) {
+                updateOrderStatus(order.getId(), "Delivered");
+            }
+        }
+    }
+
+    public Order getOrderById(Long orderId) {
+        return orepo.findById(orderId).orElseThrow(() -> new IllegalArgumentException("Invalid order Id:" + orderId));
+    }
 }

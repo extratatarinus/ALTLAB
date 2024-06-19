@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="admin/admin_base::layout(~{::section})">
+<head>
+    <title>Order Details</title>
+</head>
+<body>
+<section>
+    <div class="row px-xl-5">
+        <div class="col-lg-8">
+            <h5 class="section-title position-relative text-uppercase mb-3">Информация о заказе</h5>
+            <div class="bg-light p-30 mb-5">
+                <div class="row">
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Имя клиента</label>
+                        <input type="text" th:value="${order.firstName}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Фамилия клиента</label>
+                        <input type="text" th:value="${order.lastName}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Телефон</label>
+                        <input type="text" th:value="${order.phone}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Адрес</label>
+                        <input type="text" th:value="${order.address}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Город</label>
+                        <input type="text" th:value="${order.city}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Регион</label>
+                        <input type="text" th:value="${order.region}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Индекс</label>
+                        <input type="text" th:value="${order.zipCode}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Способ оплаты</label>
+                        <input type="text" th:value="${order.paymentMethod}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <p>Дата заказа
+                            <input type="text" th:value="${#temporals.format(order.orderDate, 'dd.MM.yyyy HH:mm')}" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="pname" readonly></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h5 class="section-title position-relative text-uppercase mb-3">Сумма заказа</h5>
+            <div class="bg-light p-30 mb-5">
+                <div class="border-bottom pt-3 pb-2">
+                    <div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6 class="font-weight-medium">Стоимость товаров</h6>
+                            <h6 class="font-weight-medium" th:text="${order.totalSum} + '₽'"></h6>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6 class="font-weight-medium">Доставка</h6>
+                            <h6 class="font-weight-medium" th:text="${order.shippingCost} + '₽'"></h6>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-medium">Скидка @ <span th:text="${order.discountPercentage} + '%'"></span></h6>
+                            <h6 class="font-weight-medium" th:text="'-' + ${order.discountAmount} + '₽'"></h6>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5>Всего</h5>
+                            <h5 th:text="${#numbers.formatDecimal(order.finalTotal, 1, 'COMMA', 2, 'POINT')} + ' ₽'"></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Название товара</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${order.items}">
+                <td th:text="${item.product.pname}">Product Name</td>
+                <td th:text="${item.quantity}">Quantity</td>
+                <td th:text="${item.price}">Price</td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:if="${order.status == 'Pending'}">
+            <form th:action="@{/ADMIN/order/update-status/{orderId}/{status}/{redirect}(orderId=${order.id}, status='Processing', redirect='Pending')}"
+                  method="post">
+                <button type="submit" class="btn btn-primary">Изготовить</button>
+            </form>
+        </div>
+        <div th:if="${order.status == 'Processing'}">
+            <form th:action="@{/ADMIN/order/update-status/{orderId}/{status}/{redirect}(orderId=${order.id}, status='Shipped', redirect='Processing')}"
+                  method="post">
+                <button type="submit" class="btn btn-primary">Доставить</button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="admin/admin_base::layout(~{::section})">
+<head>
+</head>
+<body>
+<section>
+    <div class="col-sm-12 col-xl-12 mt-4">
+        <div class="bg-light rounded h-80 p-4">
+            <h6 class="mb-4">Готовящиеся заказы</h6>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Имя заказчика</th>
+                    <th>Дата заказа</th>
+                    <th>Информация</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.firstName + ' ' + order.lastName}">Customer Name</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'dd.MM.yyyy HH:mm')}">Order Date</td>
+                    <td><a th:href="@{/ADMIN/order/{orderId}(orderId=${order.id})}" class="btn btn-info">Обзор</a></td>
+                    <td>
+                        <form th:action="@{/ADMIN/order/update-status/{orderId}/{status}/{redirect}(orderId=${order.id}, status='Shipped', redirect='Processing')}" method="post">
+                            <button type="submit" class="btn btn-primary">Отправить клиенту</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p>Всего готовящихся заказов: <span th:text="${orderCount}">0</span></p>
+        </div>
+    </div>
+</section>
+</body>
+</html>
+>

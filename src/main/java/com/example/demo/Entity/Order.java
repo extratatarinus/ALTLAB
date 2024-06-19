@@ -37,6 +37,9 @@ public class Order {
     private double discountAmount;
     private double finalTotal;
 
+    private LocalDateTime deliveryDate;
+    private long daysToDeliver;
+
     public Order() {
     }
 
@@ -182,6 +185,22 @@ public class Order {
 
     public void setFinalTotal(double finalTotal) {
         this.finalTotal = finalTotal;
+    }
+
+    public LocalDateTime getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(LocalDateTime deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    }
+
+    public long getDaysToDeliver() {
+        return daysToDeliver;
+    }
+
+    public void setDaysToDeliver(long daysToDeliver) {
+        this.daysToDeliver = daysToDeliver;
     }
 
     @PrePersist

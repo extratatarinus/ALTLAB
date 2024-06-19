@@ -40,9 +40,12 @@ public class homeController {
         Pageable pageable = PageRequest.of(0, 8);
         List<product> newProducts = aservice.findTop8ByOrderByAddDateDesc(pageable);
         List<product> topProducts = aservice.findTop8ByOrderByReviewsCountDesc(pageable);
+        List<category> categoryList = aservice.getCategories();
         model.addAttribute("topProducts", topProducts);
         model.addAttribute("newProducts", newProducts);
+        model.addAttribute("cat", categoryList != null ? categoryList : new ArrayList<>());
         getProductActivity(model,currentUrl);
+
         return getCurrentUser(model, session, "home");
     }
 

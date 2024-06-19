@@ -5,6 +5,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import com.example.demo.Entity.*;
@@ -313,5 +315,76 @@ public class adminController {
 		model.addAttribute("categories", session.getAttribute("categories"));
 		model.addAttribute("rcount", session.getAttribute("rcount"));
 		response.sendRedirect("/ADMIN/users");
+	}
+
+	@GetMapping("/order/pending")
+	public String showPendingOrders(Model model, HttpSession session) {
+		List<Order> orders = aservice.getPendingOrders();
+		model.addAttribute("orders", orders);
+		model.addAttribute("orderCount", orders.size());
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/orders/pending";
+	}
+
+	@GetMapping("/order/processing")
+	public String showProcessingOrders(Model model, HttpSession session) {
+		List<Order> orders = aservice.getProcessingOrders();
+		model.addAttribute("orders", orders);
+		model.addAttribute("orderCount", orders.size());
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/orders/processing";
+	}
+
+	@GetMapping("/order/shipped")
+	public String showShippedOrders(Model model, HttpSession session) {
+		List<Order> orders = aservice.getShippedOrders();
+		model.addAttribute("orders", orders);
+		model.addAttribute("orderCount", orders.size());
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/orders/shipped";
+	}
+
+	@GetMapping("/order/delivered")
+	public String showDeliveredOrders(Model model, HttpSession session) {
+		List<Order> orders = aservice.getDeliveredOrders();
+		model.addAttribute("orders", orders);
+		model.addAttribute("orderCount", orders.size());
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/orders/delivered";
+	}
+
+	@PostMapping("/order/update-status/{orderId}/{status}/{redirect}")
+	public String updateOrderStatus(@PathVariable Long orderId, @PathVariable String status, @PathVariable String redirect) {
+		Order order = aservice.findOrderById(orderId);
+
+		if ("shipped".equalsIgnoreCase(status)) {
+			LocalDateTime now = LocalDateTime.now();
+			LocalDateTime deliveryDate = now.plusDays(14);
+			order.setDeliveryDate(deliveryDate);
+			long daysToDeliver = ChronoUnit.DAYS.between(now, deliveryDate);
+			order.setDaysToDeliver(daysToDeliver);
+		}
+
+		aservice.updateOrderStatus(orderId, status);
+
+		return "redirect:/ADMIN/order/" + redirect.toLowerCase();
+	}
+
+	@GetMapping("/order/{orderId}")
+	public String getOrderDetails(@PathVariable Long orderId, Model model, HttpSession session) {
+		Order order = aservice.getOrderById(orderId);
+		model.addAttribute("order", order);
+		model.addAttribute("user", session.getAttribute("user"));
+		model.addAttribute("categories", session.getAttribute("categories"));
+		model.addAttribute("rcount", session.getAttribute("rcount"));
+		return "admin/orders/details";
 	}
 }
